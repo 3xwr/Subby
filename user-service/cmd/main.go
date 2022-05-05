@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 
@@ -47,12 +48,20 @@ func main() {
 	authHandler := handler.NewAuth(&logger, authService)
 	registerHandler := handler.NewRegister(&logger, authService)
 
+	resourceHandler := handler.NewResource(&logger)
+
 	r.Route("/", func(r chi.Router) {
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins: []string{"https://*", "http://*"},
+			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		}))
 		r.Use(middleware.RequestLogger(&handler.LogFormatter{Logger: &logger}))
 		r.Use(middleware.Recoverer)
 		r.Use(handler.JWT([]byte(cfg.Secret)))
 		r.Method(http.MethodPost, handler.AuthPath, authHandler)
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
+		r.Method(http.MethodGet, handler.ResourcePath, resourceHandler)
 	})
 
 	srv := http.Server{
