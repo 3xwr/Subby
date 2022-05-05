@@ -2,7 +2,8 @@ function hideErrorMessage() {
     document.getElementById("login-error").style.display ="none";
 }
 
-function showErrorMessage() {
+function showErrorMessage(msg) {
+    document.getElementById("login-error").innerHTML = msg;
     document.getElementById("login-error").style.display = "inline-block";
 }
 
@@ -32,7 +33,9 @@ $(function () {
             },
             error: function(jqXHR) {
                 if (jqXHR.status === 403) {
-                    showErrorMessage();
+                    showErrorMessage("Wrong username or password.");
+                } else {
+                    showErrorMessage("Internal server error.");
                 }
             }
         });
