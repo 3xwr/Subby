@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
@@ -17,7 +15,7 @@ type Content struct {
 }
 
 type ContentRepo interface {
-	GetUserPosts(token string) []model.Post
+	GetUserPosts(token string) ([]model.Post, error)
 }
 
 func NewContent(logger *zerolog.Logger, repo ContentRepo, secret string) *Content {
@@ -32,10 +30,11 @@ func (s *Content) GetUserFeed(token string) ([]model.Post, error) {
 	//do some ordering??
 	userId, err := jwt.ParseString(token, jwt.WithVerify(jwa.HS256, []byte(s.secret)), jwt.WithValidate(true))
 	if err != nil {
-		fmt.Println(err)
 		return []model.Post{}, err
 	}
-	fmt.Println(userId.Subject())
-	posts := s.repo.GetUserPosts(userId.Subject())
+	posts, err := s.repo.GetUserPosts(userId.Subject())
+	if err != nil {
+		return []model.Post{}, err
+	}
 	return posts, nil
 }

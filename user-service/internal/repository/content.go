@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"user-service/internal/model"
 )
 
@@ -14,16 +13,15 @@ func NewContent(db *sql.DB) *Content {
 	return &Content{db}
 }
 
-func (db *Content) GetUserPosts(user_id string) []model.Post {
+func (db *Content) GetUserPosts(user_id string) ([]model.Post, error) {
 	var username string
 	err := db.QueryRow("SELECT username FROM users WHERE id=$1", user_id).Scan(&username)
 	if err != nil {
-		fmt.Println("query 2", err)
-		return []model.Post{}
+		return []model.Post{}, err
 	}
 	return []model.Post{
 		{
 			Body: username,
 		},
-	}
+	}, nil
 }
