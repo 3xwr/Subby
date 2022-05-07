@@ -2,26 +2,32 @@ package repository
 
 import (
 	"database/sql"
-	"user-service/internal/model"
 )
 
-type Content struct {
+type Subscriptions struct {
 	*sql.DB
 }
 
-func NewContent(db *sql.DB) *Content {
-	return &Content{db}
+func NewSubscriptions(db *sql.DB) *Subscriptions {
+	return &Subscriptions{db}
 }
 
-func (db *Content) GetUserPosts(user_id string) ([]model.Post, error) {
-	var username string
-	err := db.QueryRow("SELECT username FROM users WHERE id=$1", user_id).Scan(&username)
+func (db *Subscriptions) GetUserSubs(user_id string) ([]string, error) {
+	rows, err := db.Query("SELECT subbed_to_user_id FROM user_subs WHERE user_id=$1", user_id)
 	if err != nil {
-		return []model.Post{}, err
+		return nil, err
 	}
-	return []model.Post{
-		{
-			Body: username,
-		},
-	}, nil
+	defer rows.Close()
+
+	var userSubs []string
+
+	for rows.Next() {
+		var sub string
+		if err := rows.Scan(&sub); err != nil {
+			return nil, err
+		}
+		userSubs = append(userSubs, sub)
+	}
+
+	return userSubs, nil
 }

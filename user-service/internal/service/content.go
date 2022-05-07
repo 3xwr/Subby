@@ -4,37 +4,34 @@ import (
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
-
-	"user-service/internal/model"
 )
 
-type Content struct {
+type Subscriptions struct {
 	logger *zerolog.Logger
-	repo   ContentRepo
+	repo   SubscriptionsRepo
 	secret string
 }
 
-type ContentRepo interface {
-	GetUserPosts(token string) ([]model.Post, error)
+type SubscriptionsRepo interface {
+	GetUserSubs(token string) ([]string, error)
 }
 
-func NewContent(logger *zerolog.Logger, repo ContentRepo, secret string) *Content {
-	return &Content{
+func NewSubscriptions(logger *zerolog.Logger, repo SubscriptionsRepo, secret string) *Subscriptions {
+	return &Subscriptions{
 		logger: logger,
 		repo:   repo,
 		secret: secret,
 	}
 }
 
-func (s *Content) GetUserFeed(token string) ([]model.Post, error) {
-	//do some ordering??
+func (s *Subscriptions) GetUserSubscriptionList(token string) ([]string, error) {
 	userId, err := jwt.ParseString(token, jwt.WithVerify(jwa.HS256, []byte(s.secret)), jwt.WithValidate(true))
 	if err != nil {
-		return []model.Post{}, err
+		return nil, err
 	}
-	posts, err := s.repo.GetUserPosts(userId.Subject())
+	posts, err := s.repo.GetUserSubs(userId.Subject())
 	if err != nil {
-		return []model.Post{}, err
+		return nil, err
 	}
 	return posts, nil
 }
