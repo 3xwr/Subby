@@ -29,3 +29,11 @@ type RegisterResponse struct {
 	Username string `json:"username"`
 	Created  bool   `json:"created"`
 }
+
+type UserContentResponse struct {
+	Token string `json:"token"`
+}
+
+type Post struct {
+	Body string `json:"body"`
+}

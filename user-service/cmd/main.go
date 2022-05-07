@@ -48,7 +48,9 @@ func main() {
 	authHandler := handler.NewAuth(&logger, authService)
 	registerHandler := handler.NewRegister(&logger, authService)
 
-	resourceHandler := handler.NewResource(&logger)
+	contentRepo := repository.NewContent(db)
+	contentService := service.NewContent(&logger, contentRepo, cfg.Secret)
+	contentHandler := handler.NewContent(&logger, contentService)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
@@ -61,7 +63,7 @@ func main() {
 		r.Use(handler.JWT([]byte(cfg.Secret)))
 		r.Method(http.MethodPost, handler.AuthPath, authHandler)
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
-		r.Method(http.MethodGet, handler.ResourcePath, resourceHandler)
+		r.Method(http.MethodGet, handler.ContentPath, contentHandler)
 	})
 
 	srv := http.Server{
