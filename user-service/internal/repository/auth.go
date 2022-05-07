@@ -51,7 +51,7 @@ func (db *Auth) SaveToken(userID uuid.UUID, token string) error {
 func (db *Auth) SaveUser(username string, password string) error {
 	var name string
 	err := db.QueryRow("SELECT username FROM users WHERE username = $1", username).Scan(&name)
-	if err != nil {
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
