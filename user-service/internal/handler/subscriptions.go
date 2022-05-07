@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strings"
 	"user-service/internal/model"
 
 	"github.com/rs/zerolog"
@@ -29,9 +28,13 @@ type SubscriptionsService interface {
 }
 
 func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	token := strings.SplitN(authHeader, " ", 2)
-	subs, err := h.service.GetUserSubscriptionList(token[1])
+	userID, err := getUserID(r)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("Invalid incoming data")
+		writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+		return
+	}
+	subs, err := h.service.GetUserSubscriptionList(userID)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Invalid incoming data")
 		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
