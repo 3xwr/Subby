@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"user-service/internal/model"
 
+	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
 )
 
@@ -25,20 +27,58 @@ func NewSubscriptions(logger *zerolog.Logger, srv SubscriptionsService) *Subscri
 
 type SubscriptionsService interface {
 	GetUserSubscriptionList(string) ([]string, error)
+	SubscribeCurrentUserToUser(string, string) error
 }
 
 func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userID, err := getUserID(r)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("Invalid incoming data")
-		writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-		return
+	if r.Method == http.MethodGet {
+		userID, err := getUserID(r)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+			return
+		}
+		subs, err := h.service.GetUserSubscriptionList(userID)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
+			return
+		}
+		writeResponse(w, http.StatusOK, subs)
 	}
-	subs, err := h.service.GetUserSubscriptionList(userID)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("Invalid incoming data")
-		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
-		return
+
+	if r.Method == http.MethodPost {
+		userIDToken, err := getUserID(r)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+			return
+		}
+		userId, err := jwt.ParseString(userIDToken)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+			return
+		}
+
+		var u model.User
+		err = json.NewDecoder(r.Body).Decode(&u)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+			return
+		}
+		err = h.service.SubscribeCurrentUserToUser(userIDToken, u.ID.String())
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+			return
+		}
+		resp := model.SubscriptionSuccessResponse{
+			Subscriber: userId.Subject(),
+			Subscribee: u.ID.String(),
+			Subscribed: true,
+		}
+		writeResponse(w, http.StatusOK, resp)
 	}
-	writeResponse(w, http.StatusOK, subs)
 }
