@@ -30,70 +30,63 @@ const (
 	imgBasePath = "../../Subby-images/"
 )
 
+var allowedExtensions = []string{".png", ".jpg", ".jpeg"}
+
 type UploadRepo interface {
 }
 
 func (s *Upload) UploadImage(file multipart.File, handler *multipart.FileHeader) (string, error) {
-	fmt.Printf("Uploaded File: %+v\n", handler.Filename)
-	fmt.Printf("File Size: %+v\n", handler.Size)
-	fmt.Printf("MIME Header: %+v\n", handler.Header)
-
+	extensionAllowed := false
 	fileName := imgBasePath + handler.Filename
-
-	if !fileExists(fileName) {
-		f, err := os.Create(fileName)
-		if err != nil {
-			return "", err
+	ext := filepath.Ext(fileName)
+	for _, extension := range allowedExtensions {
+		if ext == extension {
+			extensionAllowed = true
 		}
-		defer f.Close()
-
-		fileBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			return "", err
-		}
-
-		contentType := http.DetectContentType(fileBytes)
-		if contentType == "image/png" {
-			f.Write(fileBytes)
-		} else {
-			return "", err
-		}
-
-		fmt.Println("FILE UPLOADED")
-		return fileName, nil
-	} else {
-		rand.Seed(time.Now().UnixNano())
-		name := fileName
-		for fileExists(name) {
-			if len(name) > 512 {
-				return "", fmt.Errorf("filename is too long")
-			}
-			ext := filepath.Ext(name)
-			name = strings.TrimSuffix(name, ext)
-			name += fmt.Sprint(rand.Intn(10))
-			name += ext
-		}
-		f, err := os.Create(name)
-		if err != nil {
-			return "", err
-		}
-		defer f.Close()
-
-		fileBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			return "", err
-		}
-
-		contentType := http.DetectContentType(fileBytes)
-		if contentType == "image/png" {
-			f.Write(fileBytes)
-		} else {
-			return "", err
-		}
-
-		fmt.Println("FILE UPLOADED")
-		return name, nil
 	}
+
+	if !extensionAllowed {
+		return "", fmt.Errorf("unsupported file format uploaded")
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	for fileExists(fileName) {
+		if len(fileName) > 512 {
+			return "", fmt.Errorf("filename is too long")
+		}
+		fileName = strings.TrimSuffix(fileName, ext)
+		fileName += fmt.Sprint(rand.Intn(10))
+		fileName += ext
+	}
+
+	f, err := os.Create(fileName)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return "", err
+	}
+
+	contentTypeAllowed := false
+
+	contentType := http.DetectContentType(fileBytes)
+	for _, extension := range allowedExtensions {
+		imgType := "image/" + trimLeftChar(extension)
+		if contentType == imgType {
+			contentTypeAllowed = true
+		}
+	}
+
+	if contentTypeAllowed {
+		f.Write(fileBytes)
+	} else {
+		return "", fmt.Errorf("unsupported file format uploaded")
+	}
+
+	return fileName, nil
 }
 
 func fileExists(filename string) bool {
@@ -102,4 +95,13 @@ func fileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func trimLeftChar(s string) string {
+	for i := range s {
+		if i > 0 {
+			return s[i:]
+		}
+	}
+	return s[:0]
 }

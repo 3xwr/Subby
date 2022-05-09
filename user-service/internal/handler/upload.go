@@ -38,6 +38,12 @@ func (h *Upload) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	if handler.Size > 10485760 {
+		h.logger.Error().Err(err).Msg("Invalid incoming data")
+		writeResponse(w, http.StatusBadRequest, model.Error{Error: "Upload too big"})
+		return
+	}
+
 	name, err := h.service.UploadImage(file, handler)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Invalid incoming data")
