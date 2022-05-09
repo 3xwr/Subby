@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"database/sql"
+
+	"github.com/google/uuid"
+)
 
 const (
 	UserExistsError = "user with this username already exists"
@@ -35,5 +39,10 @@ type UserContentResponse struct {
 }
 
 type Post struct {
-	Body string `json:"body"`
+	PostID        uuid.UUID      `json:"post_id"`
+	PosterID      uuid.UUID      `json:"poster_id"`
+	Body          sql.NullString `json:"body"`
+	PaywallLocked bool           `json:"paywall_locked"`
+	PaywallTier   sql.NullInt64  `json:"paywall_tier,omitempty"`
+	ImageRef      sql.NullString `json:"image_ref,omitempty"`
 }
