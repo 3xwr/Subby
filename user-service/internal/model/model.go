@@ -1,7 +1,7 @@
 package model
 
 import (
-	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -34,15 +34,18 @@ type RegisterResponse struct {
 	Created  bool   `json:"created"`
 }
 
-type UserContentResponse struct {
-	Token string `json:"token"`
+type SubscriptionSuccessResponse struct {
+	Subscriber string `json:"subscriber"`
+	Subscribee string `json:"subscribee"`
+	Subscribed bool   `json:"subscribed"`
 }
 
 type Post struct {
-	PostID        uuid.UUID      `json:"post_id"`
-	PosterID      uuid.UUID      `json:"poster_id"`
-	Body          sql.NullString `json:"body"`
-	PaywallLocked bool           `json:"paywall_locked"`
-	PaywallTier   sql.NullInt64  `json:"paywall_tier,omitempty"`
-	ImageRef      sql.NullString `json:"image_ref,omitempty"`
+	PostID        uuid.UUID `json:"post_id"`
+	PostedAt      time.Time `json:"posted_at"`
+	PosterID      uuid.UUID `json:"poster_id"`
+	Body          *string   `json:"body"`
+	PaywallLocked bool      `json:"paywall_locked"`
+	PaywallTier   *int      `json:"paywall_tier,omitempty"`
+	ImageRef      *string   `json:"image_ref,omitempty"`
 }

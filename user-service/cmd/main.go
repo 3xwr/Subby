@@ -66,6 +66,7 @@ func main() {
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
 		r.Method(http.MethodGet, handler.SubscriptionsPath, subscriptionsHandler)
 		r.Method(http.MethodGet, handler.PostsPath, postsHandler)
+		r.Method(http.MethodPost, handler.SubscriptionsPath, subscriptionsHandler)
 	})
 
 	srv := http.Server{

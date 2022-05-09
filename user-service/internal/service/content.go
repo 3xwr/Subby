@@ -16,6 +16,7 @@ type Content struct {
 
 type ContentRepo interface {
 	GetUserSubs(string) ([]string, error)
+	AddUserSubscription(string, string) error
 	GetUserFeed(string, int) ([]model.Post, error)
 }
 
@@ -41,6 +42,18 @@ func (s *Content) GetUserSubscriptionList(token string) ([]string, error) {
 		return nil, err
 	}
 	return subs, nil
+}
+
+func (s *Content) SubscribeCurrentUserToUser(subbingUserToken string, subscribeToUserId string) error {
+	subbingUserId, err := jwt.ParseString(subbingUserToken, jwt.WithVerify(jwa.HS256, []byte(s.secret)), jwt.WithValidate(true))
+	if err != nil {
+		return err
+	}
+	err = s.repo.AddUserSubscription(subbingUserId.Subject(), subscribeToUserId)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Content) GetPostsFeedByID(token string) ([]model.Post, error) {
