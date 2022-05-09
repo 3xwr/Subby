@@ -66,13 +66,15 @@ func main() {
 		r.Use(middleware.Recoverer)
 		r.Use(handler.JWT([]byte(cfg.Secret)))
 
-		r.Method(http.MethodPost, handler.AuthPath, authHandler)
-		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
 		r.Method(http.MethodGet, handler.SubscriptionsPath, subscriptionsHandler)
 		r.Method(http.MethodGet, handler.PostsPath, postsHandler)
+
+		r.Method(http.MethodPost, handler.AuthPath, authHandler)
+		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
 		r.Method(http.MethodPost, handler.SubscribePath, subscriptionsHandler)
 		r.Method(http.MethodPost, handler.UnsubscribePath, subscriptionsHandler)
 		r.Method(http.MethodPost, handler.UploadPath, uploadHandler)
+		r.Method(http.MethodPost, handler.PostPath, postsHandler)
 	})
 
 	srv := http.Server{

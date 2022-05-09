@@ -34,14 +34,14 @@ type SubscriptionsService interface {
 }
 
 func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	userIDToken, err := getUserID(r)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("Invalid incoming data")
+		writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+		return
+	}
 	if r.Method == http.MethodGet {
-		userID, err := getUserID(r)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-			return
-		}
-		subs, err := h.service.GetUserSubscriptionList(userID)
+		subs, err := h.service.GetUserSubscriptionList(userIDToken)
 		if err != nil {
 			h.logger.Error().Err(err).Msg("Invalid incoming data")
 			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
@@ -52,12 +52,6 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		if r.URL.String() == SubscribePath {
-			userIDToken, err := getUserID(r)
-			if err != nil {
-				h.logger.Error().Err(err).Msg("Invalid incoming data")
-				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-				return
-			}
 			userId, err := jwt.ParseString(userIDToken)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
@@ -86,12 +80,6 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusOK, resp)
 		}
 		if r.URL.String() == UnsubscribePath {
-			userIDToken, err := getUserID(r)
-			if err != nil {
-				h.logger.Error().Err(err).Msg("Invalid incoming data")
-				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-				return
-			}
 			userId, err := jwt.ParseString(userIDToken)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")

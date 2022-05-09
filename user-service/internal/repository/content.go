@@ -91,6 +91,14 @@ func (db *Content) RemoveUserSubscription(currentUser string, userToUnsubscribeF
 	return nil
 }
 
+func (db *Content) SaveNewPost(post model.Post) error {
+	_, err := db.Exec("INSERT INTO posts (post_id, posted_at, poster_id, body, paywall_locked, paywall_tier, image_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)", post.PostID, post.PostedAt, post.PosterID, post.Body, post.PaywallLocked, post.PaywallTier, post.ImageRef)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) {
 	subs, err := db.GetUserSubs(userID)
 	if err != nil {

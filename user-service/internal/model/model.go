@@ -51,6 +51,13 @@ type UnsubSuccessResponse struct {
 	UnsubSuccess bool   `json:"unsub_success"`
 }
 
+type PostSubmitRequest struct {
+	Body          *string `json:"body"`
+	PaywallLocked bool    `json:"paywall_locked"`
+	PaywallTier   *int    `json:"paywall_tier,omitempty"`
+	ImageRef      *string `json:"image_ref,omitempty"`
+}
+
 type Post struct {
 	PostID        uuid.UUID `json:"post_id"`
 	PostedAt      time.Time `json:"posted_at"`
