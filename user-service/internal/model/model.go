@@ -34,10 +34,21 @@ type RegisterResponse struct {
 	Created  bool   `json:"created"`
 }
 
-type SubscriptionSuccessResponse struct {
+type UploadResponse struct {
+	FileAddress string `json:"file_address"`
+	Uploaded    bool   `json:"uploaded"`
+}
+
+type SubSuccessResponse struct {
 	Subscriber string `json:"subscriber"`
-	Subscribee string `json:"subscribee"`
-	Subscribed bool   `json:"subscribed"`
+	Subscribed string `json:"subscribed"`
+	SubSuccess bool   `json:"sub_success"`
+}
+
+type UnsubSuccessResponse struct {
+	Subscriber   string `json:"subscriber"`
+	Unsubscribed string `json:"unsubscribed"`
+	UnsubSuccess bool   `json:"unsub_success"`
 }
 
 type Post struct {

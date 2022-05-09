@@ -44,14 +44,17 @@ func main() {
 	}
 
 	authRepo := repository.NewAuth(db)
+	contentRepo := repository.NewContent(db)
+
 	authService := service.NewAuth(&logger, authRepo, []byte(cfg.Secret))
+	contentService := service.NewContent(&logger, contentRepo, cfg.Secret)
+	uploadService := service.NewUpload(&logger, contentRepo)
+
 	authHandler := handler.NewAuth(&logger, authService)
 	registerHandler := handler.NewRegister(&logger, authService)
-
-	contentRepo := repository.NewContent(db)
-	contentService := service.NewContent(&logger, contentRepo, cfg.Secret)
 	subscriptionsHandler := handler.NewSubscriptions(&logger, contentService)
 	postsHandler := handler.NewPosts(&logger, contentService)
+	uploadHandler := handler.NewUpload(&logger, uploadService)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
@@ -62,11 +65,14 @@ func main() {
 		r.Use(middleware.RequestLogger(&handler.LogFormatter{Logger: &logger}))
 		r.Use(middleware.Recoverer)
 		r.Use(handler.JWT([]byte(cfg.Secret)))
+
 		r.Method(http.MethodPost, handler.AuthPath, authHandler)
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
 		r.Method(http.MethodGet, handler.SubscriptionsPath, subscriptionsHandler)
 		r.Method(http.MethodGet, handler.PostsPath, postsHandler)
-		r.Method(http.MethodPost, handler.SubscriptionsPath, subscriptionsHandler)
+		r.Method(http.MethodPost, handler.SubscribePath, subscriptionsHandler)
+		r.Method(http.MethodPost, handler.UnsubscribePath, subscriptionsHandler)
+		r.Method(http.MethodPost, handler.UploadPath, uploadHandler)
 	})
 
 	srv := http.Server{

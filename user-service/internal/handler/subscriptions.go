@@ -11,6 +11,8 @@ import (
 
 const (
 	SubscriptionsPath = "/subscriptions"
+	SubscribePath     = "/subscribe"
+	UnsubscribePath   = "/unsubscribe"
 )
 
 type Subscriptions struct {
@@ -28,6 +30,7 @@ func NewSubscriptions(logger *zerolog.Logger, srv SubscriptionsService) *Subscri
 type SubscriptionsService interface {
 	GetUserSubscriptionList(string) ([]string, error)
 	SubscribeCurrentUserToUser(string, string) error
+	UnsubscribeFromUser(string, string) error
 }
 
 func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -48,37 +51,73 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		userIDToken, err := getUserID(r)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-			return
-		}
-		userId, err := jwt.ParseString(userIDToken)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-			return
-		}
+		if r.URL.String() == SubscribePath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
+			userId, err := jwt.ParseString(userIDToken)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 
-		var u model.User
-		err = json.NewDecoder(r.Body).Decode(&u)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
-			return
+			var u model.User
+			err = json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.SubscribeCurrentUserToUser(userIDToken, u.ID.String())
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			resp := model.SubSuccessResponse{
+				Subscriber: userId.Subject(),
+				Subscribed: u.ID.String(),
+				SubSuccess: true,
+			}
+			writeResponse(w, http.StatusOK, resp)
 		}
-		err = h.service.SubscribeCurrentUserToUser(userIDToken, u.ID.String())
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
-			return
+		if r.URL.String() == UnsubscribePath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
+			userId, err := jwt.ParseString(userIDToken)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
+
+			var u model.User
+			err = json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.UnsubscribeFromUser(userIDToken, u.ID.String())
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			resp := model.UnsubSuccessResponse{
+				Subscriber:   userId.Subject(),
+				Unsubscribed: u.ID.String(),
+				UnsubSuccess: true,
+			}
+			writeResponse(w, http.StatusOK, resp)
 		}
-		resp := model.SubscriptionSuccessResponse{
-			Subscriber: userId.Subject(),
-			Subscribee: u.ID.String(),
-			Subscribed: true,
-		}
-		writeResponse(w, http.StatusOK, resp)
 	}
 }

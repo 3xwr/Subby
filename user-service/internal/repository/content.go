@@ -71,6 +71,26 @@ func (db *Content) AddUserSubscription(currentUser string, userToSubsrcibeTo str
 	return nil
 }
 
+func (db *Content) RemoveUserSubscription(currentUser string, userToUnsubscribeFrom string) error {
+	err := db.checkIfUserExists(userToUnsubscribeFrom)
+	if err != nil {
+		return err
+	}
+	subs, err := db.GetUserSubs(currentUser)
+	if err != nil {
+		return err
+	}
+	for _, sub := range subs {
+		if userToUnsubscribeFrom == sub {
+			_, err = db.Exec("DELETE FROM user_subs WHERE user_id=$1 AND subbed_to_user_id=$2", currentUser, userToUnsubscribeFrom)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) {
 	subs, err := db.GetUserSubs(userID)
 	if err != nil {
