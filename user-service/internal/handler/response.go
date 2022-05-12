@@ -2,7 +2,9 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 )
 
 func writeResponse(w http.ResponseWriter, code int, v interface{}) {
@@ -15,4 +17,13 @@ func writeResponse(w http.ResponseWriter, code int, v interface{}) {
 	}
 	w.WriteHeader(code)
 	w.Write([]byte(b))
+}
+
+func getUserID(r *http.Request) (string, error) {
+	authHeader := r.Header.Get("Authorization")
+	tokens := strings.SplitN(authHeader, " ", 2)
+	if len(tokens) != 2 {
+		return "", fmt.Errorf("incorrect user ID")
+	}
+	return tokens[1], nil
 }
