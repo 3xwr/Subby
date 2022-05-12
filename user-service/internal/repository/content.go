@@ -97,7 +97,7 @@ func (db *Content) RemoveUserSubscription(currentUser string, userToUnsubscribeF
 }
 
 func (db *Content) SaveNewPost(post model.Post) error {
-	_, err := db.Exec("INSERT INTO posts (post_id, posted_at, poster_id, body, paywall_locked, paywall_tier, image_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)", post.PostID, post.PostedAt, post.PosterID, post.Body, post.PaywallLocked, post.PaywallTier, post.ImageRef)
+	_, err := db.Exec("INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)", post.PostID, post.PostedAt, post.PosterID, post.Body, post.MembershipLocked, post.MembershipTier, post.ImageRef)
 	if err != nil {
 		return err
 	}
@@ -122,7 +122,7 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query("SELECT post_id, posted_at, poster_id, body, paywall_locked, paywall_tier, image_ref FROM posts WHERE poster_id=ANY($1) LIMIT $2", pq.Array(subs), amount)
+	rows, err := db.Query("SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref FROM posts WHERE poster_id=ANY($1) LIMIT $2", pq.Array(subs), amount)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 
 	for rows.Next() {
 		var post model.Post
-		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.PaywallLocked, &post.PaywallTier, &post.ImageRef); err != nil {
+		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)

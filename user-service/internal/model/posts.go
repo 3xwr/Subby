@@ -7,10 +7,10 @@ import (
 )
 
 type PostSubmitRequest struct {
-	Body          *string `json:"body"`
-	PaywallLocked bool    `json:"paywall_locked"`
-	PaywallTier   *int    `json:"paywall_tier,omitempty"`
-	ImageRef      *string `json:"image_ref,omitempty"`
+	Body             *string `json:"body"`
+	MembershipLocked bool    `json:"Membership_locked"`
+	MembershipTier   *int    `json:"Membership_tier,omitempty"`
+	ImageRef         *string `json:"image_ref,omitempty"`
 }
 
 type PostDeleteRequest struct {
@@ -18,11 +18,11 @@ type PostDeleteRequest struct {
 }
 
 type Post struct {
-	PostID        uuid.UUID `json:"post_id"`
-	PostedAt      time.Time `json:"posted_at"`
-	PosterID      uuid.UUID `json:"poster_id"`
-	Body          *string   `json:"body"`
-	PaywallLocked bool      `json:"paywall_locked"`
-	PaywallTier   *int      `json:"paywall_tier,omitempty"`
-	ImageRef      *string   `json:"image_ref,omitempty"`
+	PostID           uuid.UUID `json:"post_id"`
+	PostedAt         time.Time `json:"posted_at"`
+	PosterID         uuid.UUID `json:"poster_id"`
+	Body             *string   `json:"body"`
+	MembershipLocked bool      `json:"Membership_locked"`
+	MembershipTier   *int      `json:"Membership_tier,omitempty"`
+	ImageRef         *string   `json:"image_ref,omitempty"`
 }

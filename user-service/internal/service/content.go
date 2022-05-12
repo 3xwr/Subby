@@ -87,13 +87,13 @@ func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest)
 		return err
 	}
 	post := model.Post{
-		PostID:        postID,
-		PostedAt:      time.Now(),
-		PosterID:      posterID,
-		Body:          postData.Body,
-		PaywallLocked: postData.PaywallLocked,
-		PaywallTier:   postData.PaywallTier,
-		ImageRef:      postData.ImageRef,
+		PostID:           postID,
+		PostedAt:         time.Now(),
+		PosterID:         posterID,
+		Body:             postData.Body,
+		MembershipLocked: postData.MembershipLocked,
+		MembershipTier:   postData.MembershipTier,
+		ImageRef:         postData.ImageRef,
 	}
 	err = s.repo.SaveNewPost(post)
 	if err != nil {
