@@ -18,6 +18,10 @@ type CreateMembershipRequest struct {
 	Tiers []CreateTierRequest `json:"tiers"`
 }
 
+type DeleteTierRequest struct {
+	TierID uuid.UUID `json:"tier_id"`
+}
+
 type CreateTierRequest struct {
 	Name    string `json:"name"`
 	Price   int64  `json:"price"`

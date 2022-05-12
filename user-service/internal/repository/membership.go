@@ -119,3 +119,22 @@ func (db *Membership) AddTier(tier model.MembershipTier, ownerID uuid.UUID) erro
 	}
 	return nil
 }
+
+func (db *Membership) DeleteTier(tierID uuid.UUID, ownerID uuid.UUID) error {
+	var membershipID uuid.UUID
+	err := db.QueryRow("SELECT id FROM memberships WHERE owner_id = $1", ownerID).Scan(&membershipID)
+	if err != nil {
+		return err
+	}
+	var tID uuid.UUID
+	err = db.QueryRow("SELECT id FROM tiers WHERE id = $1", tierID).Scan(&tID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("DELETE FROM tiers WHERE id=$1", tierID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

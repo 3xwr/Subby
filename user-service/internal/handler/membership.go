@@ -14,6 +14,7 @@ const (
 	CreateMembershipPath = "/createmembership"
 	DeleteMembershipPath = "/deletemembership"
 	AddTierPath          = "/addtier"
+	DeleteTierPath       = "/deletetier"
 )
 
 type Membership struct {
@@ -33,7 +34,7 @@ type MembershipService interface {
 	CreateMembership(model.CreateMembershipRequest, string) error
 	DeleteMembership(string, uuid.UUID) error
 	AddTier(model.CreateTierRequest, string) error
-	// DeleteTier(string) error
+	DeleteTier(uuid.UUID, string) error
 }
 
 func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -99,6 +100,21 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			err = h.service.DeleteMembership(userIDToken, mRequest.MembershipID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
+				return
+			}
+		}
+		if r.URL.String() == DeleteTierPath {
+			var deleteTierRequest model.DeleteTierRequest
+			err := json.NewDecoder(r.Body).Decode(&deleteTierRequest)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.DeleteTier(deleteTierRequest.TierID, userIDToken)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
