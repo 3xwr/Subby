@@ -14,6 +14,16 @@ type MembershipTier struct {
 	Rewards string    `json:"rewards"`
 }
 
+type CreateMembershipRequest struct {
+	Tiers []CreateTierRequest `json:"tiers"`
+}
+
+type CreateTierRequest struct {
+	Name    string `json:"name"`
+	Price   int64  `json:"price"`
+	Rewards string `json:"rewards"`
+}
+
 type MembershipRequest struct {
 	MembershipID uuid.UUID `json:"membership_id"`
 }

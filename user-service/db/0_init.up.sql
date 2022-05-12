@@ -33,7 +33,7 @@ CREATE TABLE tokens (
 
 CREATE TABLE memberships (
     id uuid NOT NULL,
-    owner_id uuid NOT NULL,
+    owner_id uuid NOT NULL UNIQUE,
     PRIMARY KEY(id)
 );
 

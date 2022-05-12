@@ -1,8 +1,12 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
 	"user-service/internal/model"
+
+	"github.com/google/uuid"
 )
 
 type Membership struct {
@@ -38,4 +42,39 @@ func (db *Membership) GetMembershipInfo(membershipID string) (model.Membership, 
 	membership.Tiers = tiers
 
 	return membership, nil
+}
+
+func (db *Membership) CreateMembership(membership model.Membership) error {
+	ctx := context.Background()
+	membershipID, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO memberships (id, owner_id) VALUES ($1, $2)", membershipID, membership.OwnerID)
+	if err != nil {
+		fmt.Println("memberships insert error")
+		tx.Rollback()
+		return err
+	}
+
+	for _, tier := range membership.Tiers {
+		_, err = tx.ExecContext(ctx, "INSERT INTO tiers (id, name, price, rewards, membership_id) VALUES ($1, $2, $3, $4, $5)", tier.ID, tier.Name, tier.Price, tier.Rewards, membershipID)
+		if err != nil {
+			fmt.Println("tiers insert error")
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
