@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"user-service/internal/model"
 
+	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 )
 
 const (
 	MembershipPath       = "/membership"
 	CreateMembershipPath = "/createmembership"
+	DeleteMembershipPath = "/deletemembership"
 )
 
 type Membership struct {
@@ -28,7 +30,7 @@ func NewMembership(logger *zerolog.Logger, srv MembershipService) *Membership {
 type MembershipService interface {
 	GetMembershipInfo(string) (model.Membership, error)
 	CreateMembership(model.CreateMembershipRequest, string) error
-	// DeleteMembership(string, string) error
+	DeleteMembership(string, uuid.UUID) error
 	// AddTier(model.MembershipTier, string, string) error
 	// DeleteTier(string) error
 }
@@ -71,6 +73,21 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			writeResponse(w, http.StatusOK, membership)
+		}
+		if r.URL.String() == DeleteMembershipPath {
+			var mRequest model.MembershipRequest
+			err := json.NewDecoder(r.Body).Decode(&mRequest)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.DeleteMembership(userIDToken, mRequest.MembershipID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
+				return
+			}
 		}
 
 	}

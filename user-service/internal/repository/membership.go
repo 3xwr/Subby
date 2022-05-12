@@ -78,3 +78,31 @@ func (db *Membership) CreateMembership(membership model.Membership) error {
 
 	return nil
 }
+
+func (db *Membership) DeleteMembership(ownerID uuid.UUID, membershipID uuid.UUID) error {
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	var membership model.Membership
+	err = tx.QueryRow("SELECT owner_id FROM memberships WHERE id = $1 AND owner_id = $2", membershipID, ownerID).Scan(&membership.OwnerID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "DELETE FROM memberships WHERE id=$1 AND owner_id=$2", membershipID, ownerID)
+	if err != nil {
+		fmt.Println("memberships insert error")
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
+}

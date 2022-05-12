@@ -16,6 +16,7 @@ type Membership struct {
 type MembershipRepo interface {
 	GetMembershipInfo(string) (model.Membership, error)
 	CreateMembership(model.Membership) error
+	DeleteMembership(uuid.UUID, uuid.UUID) error
 }
 
 func NewMembership(logger *zerolog.Logger, repo MembershipRepo) *Membership {
@@ -63,6 +64,23 @@ func (s *Membership) CreateMembership(mCreateRequest model.CreateMembershipReque
 	}
 
 	err = s.repo.CreateMembership(membership)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *Membership) DeleteMembership(token string, membershipID uuid.UUID) error {
+	userId, err := jwt.ParseString(token)
+	if err != nil {
+		return err
+	}
+	ownerID, err := uuid.Parse(userId.Subject())
+	if err != nil {
+		return err
+	}
+	err = s.repo.DeleteMembership(ownerID, membershipID)
 	if err != nil {
 		return err
 	}
