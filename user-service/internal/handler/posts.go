@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	PostsPath = "/posts"
-	PostPath  = "/post"
+	PostsPath      = "/posts"
+	PostPath       = "/post"
+	DeletePostPath = "/deletepost"
 )
 
 type Posts struct {
@@ -28,6 +29,7 @@ func NewPosts(logger *zerolog.Logger, srv PostsService) *Posts {
 type PostsService interface {
 	GetPostsFeedByID(string) ([]model.Post, error)
 	SubmitPost(string, model.PostSubmitRequest) error
+	DeletePost(string, string) error
 }
 
 func (h *Posts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -47,18 +49,36 @@ func (h *Posts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		writeResponse(w, http.StatusOK, posts)
 	}
 	if r.Method == http.MethodPost {
-		var post model.PostSubmitRequest
-		err = json.NewDecoder(r.Body).Decode(&post)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
-			return
+		if r.URL.String() == PostPath {
+			var post model.PostSubmitRequest
+			err = json.NewDecoder(r.Body).Decode(&post)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err := h.service.SubmitPost(userID, post)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Error while submitting post"})
+				return
+			}
 		}
-		err := h.service.SubmitPost(userID, post)
-		if err != nil {
-			h.logger.Error().Err(err).Msg("Invalid incoming data")
-			writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Error while submitting post"})
-			return
+		if r.URL.String() == DeletePostPath {
+			var postToRemove model.PostDeleteRequest
+			err = json.NewDecoder(r.Body).Decode(&postToRemove)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err := h.service.DeletePost(postToRemove.PostID.String(), userID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Error while deleting post"})
+				return
+			}
 		}
+
 	}
 }

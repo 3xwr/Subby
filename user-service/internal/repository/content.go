@@ -16,6 +16,11 @@ func NewContent(db *sql.DB) *Content {
 	return &Content{db}
 }
 
+type post struct {
+	postID   uuid.UUID
+	posterID uuid.UUID
+}
+
 func (db *Content) GetUserSubs(userID string) ([]string, error) {
 	rows, err := db.Query("SELECT subbed_to_user_id FROM user_subs WHERE user_id=$1", userID)
 	if err != nil {
@@ -93,6 +98,19 @@ func (db *Content) RemoveUserSubscription(currentUser string, userToUnsubscribeF
 
 func (db *Content) SaveNewPost(post model.Post) error {
 	_, err := db.Exec("INSERT INTO posts (post_id, posted_at, poster_id, body, paywall_locked, paywall_tier, image_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)", post.PostID, post.PostedAt, post.PosterID, post.Body, post.PaywallLocked, post.PaywallTier, post.ImageRef)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Content) DeletePostFromDB(userID string, postID string) error {
+	var p post
+	err := db.QueryRow("SELECT poster_id, post_id FROM posts WHERE poster_id = $1 AND post_id = $2", userID, postID).Scan(&p.posterID, &p.postID)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("DELETE FROM posts WHERE post_id=$1", postID)
 	if err != nil {
 		return err
 	}

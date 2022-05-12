@@ -58,6 +58,10 @@ type PostSubmitRequest struct {
 	ImageRef      *string `json:"image_ref,omitempty"`
 }
 
+type PostDeleteRequest struct {
+	PostID uuid.UUID `json:"post_id"`
+}
+
 type Post struct {
 	PostID        uuid.UUID `json:"post_id"`
 	PostedAt      time.Time `json:"posted_at"`

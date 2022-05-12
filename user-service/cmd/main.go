@@ -75,6 +75,7 @@ func main() {
 		r.Method(http.MethodPost, handler.UnsubscribePath, subscriptionsHandler)
 		r.Method(http.MethodPost, handler.UploadPath, uploadHandler)
 		r.Method(http.MethodPost, handler.PostPath, postsHandler)
+		r.Method(http.MethodPost, handler.DeletePostPath, postsHandler)
 	})
 
 	srv := http.Server{

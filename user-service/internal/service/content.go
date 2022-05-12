@@ -21,6 +21,7 @@ type ContentRepo interface {
 	AddUserSubscription(string, string) error
 	RemoveUserSubscription(string, string) error
 	SaveNewPost(model.Post) error
+	DeletePostFromDB(string, string) error
 	GetUserFeed(string, int) ([]model.Post, error)
 }
 
@@ -95,6 +96,18 @@ func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest)
 		ImageRef:      postData.ImageRef,
 	}
 	err = s.repo.SaveNewPost(post)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Content) DeletePost(postID string, token string) error {
+	userId, err := jwt.ParseString(token, jwt.WithVerify(jwa.HS256, []byte(s.secret)), jwt.WithValidate(true))
+	if err != nil {
+		return err
+	}
+	err = s.repo.DeletePostFromDB(userId.Subject(), postID)
 	if err != nil {
 		return err
 	}
