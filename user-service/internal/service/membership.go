@@ -17,6 +17,7 @@ type MembershipRepo interface {
 	GetMembershipInfo(string) (model.Membership, error)
 	CreateMembership(model.Membership) error
 	DeleteMembership(uuid.UUID, uuid.UUID) error
+	AddTier(model.MembershipTier, uuid.UUID) error
 }
 
 func NewMembership(logger *zerolog.Logger, repo MembershipRepo) *Membership {
@@ -85,5 +86,31 @@ func (s *Membership) DeleteMembership(token string, membershipID uuid.UUID) erro
 		return err
 	}
 
+	return nil
+}
+
+func (s *Membership) AddTier(tierCreateRequest model.CreateTierRequest, token string) error {
+	userId, err := jwt.ParseString(token)
+	if err != nil {
+		return err
+	}
+	ownerID, err := uuid.Parse(userId.Subject())
+	if err != nil {
+		return err
+	}
+	TierID, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+	tier := model.MembershipTier{
+		ID:      TierID,
+		Name:    tierCreateRequest.Name,
+		Price:   tierCreateRequest.Price,
+		Rewards: tierCreateRequest.Rewards,
+	}
+	err = s.repo.AddTier(tier, ownerID)
+	if err != nil {
+		return err
+	}
 	return nil
 }

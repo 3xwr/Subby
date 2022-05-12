@@ -82,6 +82,7 @@ func main() {
 		r.Method(http.MethodPost, handler.MembershipPath, membershipHandler)
 		r.Method(http.MethodPost, handler.CreateMembershipPath, membershipHandler)
 		r.Method(http.MethodPost, handler.DeleteMembershipPath, membershipHandler)
+		r.Method(http.MethodPost, handler.AddTierPath, membershipHandler)
 	})
 
 	srv := http.Server{
