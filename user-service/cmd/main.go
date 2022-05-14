@@ -46,11 +46,13 @@ func main() {
 	authRepo := repository.NewAuth(db)
 	contentRepo := repository.NewContent(db)
 	membershipRepo := repository.NewMembership(db)
+	shopRepo := repository.NewShop(db)
 
 	authService := service.NewAuth(&logger, authRepo, []byte(cfg.Secret))
 	contentService := service.NewContent(&logger, contentRepo, cfg.Secret)
 	uploadService := service.NewUpload(&logger, contentRepo)
 	membershipService := service.NewMembership(&logger, membershipRepo)
+	shopService := service.NewShop(&logger, shopRepo)
 
 	authHandler := handler.NewAuth(&logger, authService)
 	registerHandler := handler.NewRegister(&logger, authService)
@@ -58,6 +60,7 @@ func main() {
 	postsHandler := handler.NewPosts(&logger, contentService)
 	uploadHandler := handler.NewUpload(&logger, uploadService)
 	membershipHandler := handler.NewMembership(&logger, membershipService)
+	shopHandler := handler.NewShop(&logger, shopService)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
@@ -84,6 +87,7 @@ func main() {
 		r.Method(http.MethodPost, handler.DeleteMembershipPath, membershipHandler)
 		r.Method(http.MethodPost, handler.AddTierPath, membershipHandler)
 		r.Method(http.MethodPost, handler.DeleteTierPath, membershipHandler)
+		r.Method(http.MethodPost, handler.ShopPath, shopHandler)
 	})
 
 	srv := http.Server{
