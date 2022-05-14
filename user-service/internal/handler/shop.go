@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	ShopPath = "/shop"
+	ShopPath    = "/shop"
+	AddItemPath = "/additem"
 )
 
 type Shop struct {
@@ -27,6 +28,7 @@ func NewShop(logger *zerolog.Logger, srv ShopService) *Shop {
 
 type ShopService interface {
 	GetUserShop(uuid.UUID) ([]model.ShopItem, error)
+	AddItem(model.ShopItem) error
 }
 
 func (h *Shop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +54,21 @@ func (h *Shop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			writeResponse(w, http.StatusOK, shopItems)
+		}
+		if r.URL.String() == AddItemPath {
+			var shopItem model.ShopItem
+			err := json.NewDecoder(r.Body).Decode(&shopItem)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.AddItem(shopItem)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
+				return
+			}
 		}
 	}
 }

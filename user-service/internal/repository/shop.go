@@ -34,3 +34,11 @@ func (db *Shop) GetUserItems(OwnerID uuid.UUID) ([]model.ShopItem, error) {
 
 	return userItems, nil
 }
+
+func (db *Shop) AddItem(item model.ShopItem) error {
+	_, err := db.Exec("INSERT INTO shop_items (id, owner_id, name, price, description, image_ref) VALUES ($1, $2, $3, $4, $5, $6)", item.ID, item.OwnerID, item.Name, item.Price, item.Description, item.ImageRef)
+	if err != nil {
+		return err
+	}
+	return nil
+}
