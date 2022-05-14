@@ -57,15 +57,13 @@ func (db *Membership) CreateMembership(membership model.Membership) error {
 
 	_, err = tx.ExecContext(ctx, "INSERT INTO memberships (id, owner_id) VALUES ($1, $2)", membershipID, membership.OwnerID)
 	if err != nil {
-		fmt.Println("memberships insert error")
 		tx.Rollback()
 		return err
 	}
 
 	for _, tier := range membership.Tiers {
-		_, err = tx.ExecContext(ctx, "INSERT INTO tiers (id, name, price, rewards, membership_id) VALUES ($1, $2, $3, $4, $5)", tier.ID, tier.Name, tier.Price, tier.Rewards, membershipID)
+		_, err = tx.ExecContext(ctx, "INSERT INTO tiers (id, name, price, rewards, image_ref, membership_id) VALUES ($1, $2, $3, $4, $5, $6)", tier.ID, tier.Name, tier.Price, tier.Rewards, tier.ImageRef, membershipID)
 		if err != nil {
-			fmt.Println("tiers insert error")
 			tx.Rollback()
 			return err
 		}
@@ -113,7 +111,7 @@ func (db *Membership) AddTier(tier model.MembershipTier, ownerID uuid.UUID) erro
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO tiers (id,name,price,rewards,membership_id) VALUES ($1, $2, $3, $4, $5)", tier.ID, tier.Name, tier.Price, tier.Rewards, membershipID)
+	_, err = db.Exec("INSERT INTO tiers (id, name, price, rewards, image_ref, membership_id) VALUES ($1, $2, $3, $4, $5, $6)", tier.ID, tier.Name, tier.Price, tier.Rewards, tier.ImageRef, membershipID)
 	if err != nil {
 		return err
 	}

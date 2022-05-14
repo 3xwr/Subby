@@ -42,6 +42,7 @@ CREATE TABLE tiers (
     name varchar NOT NULL,
     price bigint NOT NULL,
     rewards varchar NOT NULL,
+    image_ref varchar,
     membership_id uuid NOT NULL REFERENCES memberships(id) ON DELETE CASCADE,
     PRIMARY KEY(id)
 );
@@ -58,5 +59,5 @@ INSERT INTO user_subs (sub_id, user_id, subbed_to_user_id) VALUES ('e7afd1e4-ce3
 INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked) VALUES ('3994378e-a378-4d9d-a367-a9104f2a3c43','2014-04-04 06:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','first ever Subby post!', false);
 INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked) VALUES ('3994378e-a378-4d9d-a367-a9104fff3c43','2014-04-04 07:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','second Subby post!', false);
 INSERT INTO memberships (id, owner_id) VALUES ('096c791f-f42b-4fa6-a303-0046e6c09b15','abd4528d-cd53-4366-83a7-1a12739904f5');
-INSERT INTO tiers (id, name, price, rewards, membership_id) VALUES ('540722b9-9bd9-4fe4-896b-fc7985cdc6bb', 'Biggest Fan', 2000, 'Shoutout at the end of the video','096c791f-f42b-4fa6-a303-0046e6c09b15');
+INSERT INTO tiers (id, name, price, rewards, image_ref, membership_id) VALUES ('540722b9-9bd9-4fe4-896b-fc7985cdc6bb', 'Biggest Fan', 2000, 'Shoutout at the end of the video','dog.png','096c791f-f42b-4fa6-a303-0046e6c09b15');
 INSERT INTO members (user_id, tier_id) VALUES ('c03867f8-0f7c-4aef-8ff6-16ab6aa24215', '540722b9-9bd9-4fe4-896b-fc7985cdc6bb');

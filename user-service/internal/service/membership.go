@@ -52,10 +52,11 @@ func (s *Membership) CreateMembership(mCreateRequest model.CreateMembershipReque
 			return err
 		}
 		tier := model.MembershipTier{
-			ID:      tierID,
-			Name:    createRequestTier.Name,
-			Price:   createRequestTier.Price,
-			Rewards: createRequestTier.Rewards,
+			ID:       tierID,
+			Name:     createRequestTier.Name,
+			Price:    createRequestTier.Price,
+			Rewards:  createRequestTier.Rewards,
+			ImageRef: createRequestTier.ImageRef,
 		}
 		tiers = append(tiers, tier)
 	}

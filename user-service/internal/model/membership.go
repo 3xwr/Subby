@@ -8,10 +8,11 @@ type Membership struct {
 }
 
 type MembershipTier struct {
-	ID      uuid.UUID `json:"id"`
-	Name    string    `json:"name"`
-	Price   int64     `json:"price"`
-	Rewards string    `json:"rewards"`
+	ID       uuid.UUID `json:"id"`
+	Name     string    `json:"name"`
+	Price    int64     `json:"price"`
+	Rewards  string    `json:"rewards"`
+	ImageRef *string   `json:"image_ref,omitempty"`
 }
 
 type CreateMembershipRequest struct {
@@ -23,9 +24,10 @@ type DeleteTierRequest struct {
 }
 
 type CreateTierRequest struct {
-	Name    string `json:"name"`
-	Price   int64  `json:"price"`
-	Rewards string `json:"rewards"`
+	Name     string  `json:"name"`
+	Price    int64   `json:"price"`
+	Rewards  string  `json:"rewards"`
+	ImageRef *string `json:"image_ref,omitempty"`
 }
 
 type MembershipRequest struct {
