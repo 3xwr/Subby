@@ -31,7 +31,9 @@ div.card{
 .card-header {
     position: relative;
 }
+
 #logged-in-user{
 margin-right:3%;
 margin-top:10%;
 }
+

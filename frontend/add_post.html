@@ -19,7 +19,7 @@
     />
     <!-- MDB -->
     <link rel="stylesheet" href="css/mdb.min.css" />
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/add_post.css" rel="stylesheet">
   </head>
   <body>
     <!-- Start your project here-->
@@ -73,9 +73,22 @@
     <!-- Container wrapper -->
   </nav>
   <!-- Navbar -->
-  <div id="posts">
+  <div class="form" name="add-post-form">
+  <form id="upload-form">
+  
+    <!-- Message input -->
+    <div class="form-outline mb-4">
+      <textarea name="post_body" class="form-control" id="form6Example7" rows="4"></textarea>
+      <label class="form-label" for="form6Example7">What's new?</label>
+    </div>
 
-  </div>
+    <label class="form-label" for="customFile">Add Image</label>
+    <input type="file" class="form-control" name="img" />
+  
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmit">Add Post</button>
+  </form>
+</div>
 
     <!-- End your project here-->
 
@@ -85,6 +98,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/loadprofile.js"></script>
-    <script type="text/javascript" src="js/user_page.js"></script>
+    <script type="text/javascript" src="js/add_post.js"></script>
   </body>
 </html>
