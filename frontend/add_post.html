@@ -77,18 +77,37 @@
   <form id="upload-form">
   
     <!-- Message input -->
+    <label>Post Body</label>
     <div class="form-outline mb-4">
-      <textarea name="post_body" class="form-control" id="form6Example7" rows="4"></textarea>
+      
+      <textarea name="post_body" class="form-control" id="post_body_input" rows="4"></textarea>
       <label class="form-label" for="form6Example7">What's new?</label>
     </div>
 
-    <label class="form-label" for="customFile">Add Image</label>
-    <input type="file" class="form-control" name="img" />
+    <div id="image-preview">
+      <label class="form-label" id="preview-label" hidden="hidden">Image Preview</label>
+      <img id="preview">
+    </div>
+
+    <div id="img-submit">
+      <label class="form-label" for="customFile">Add Image</label>
+      <input type="file" class="form-control" name="img"  />
+    </div>
+
+
   
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmit">Add Post</button>
+    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmit" disabled="disabled">Add Post</button>
+    <div class="alert alert-success" role="alert" id="submit-success" display="none">
+      Post submitted successfully!
+    </div>
+    <div class="alert alert-danger" role="alert" id="submit-error" display="none">
+      Post submitted successfully!
+    </div>
   </form>
+  
 </div>
+
 
     <!-- End your project here-->
 

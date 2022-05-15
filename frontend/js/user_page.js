@@ -31,25 +31,45 @@ $.ajax({
                         hour: "numeric",
                         minute: "2-digit"
                       });
-                    $('#posts')
-                    .append(
-                        $("<div>").addClass("card")
+                    if(img_src===undefined) {
+                        $('#posts')
                         .append(
-                            $("<div>").addClass("card-body")
+                            $("<div>").addClass("card")
                             .append(
-                                $("<h5>").addClass("card-title d-flex justify-content-start").text(data[i].poster_username)
-                            )
-                            .append(
-                                $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
-                            )
-                            .append(
-                                $("<p>").addClass("card-text").text(data[i].body)
+                                $("<div>").addClass("card-body")
+                                .append(
+                                    $("<h5>").addClass("card-title d-flex justify-content-start").text(data[i].poster_username)
+                                )
+                                .append(
+                                    $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
+                                )
+                                .append(
+                                    $("<p>").addClass("card-text").text(data[i].body)
+                                )
                             )
                         )
+                    } else {
+                        $('#posts')
                         .append(
-                            $('<img>').attr("src", base_path+img_src).addClass("card-img-top")
+                            $("<div>").addClass("card")
+                            .append(
+                                $("<div>").addClass("card-body")
+                                .append(
+                                    $("<h5>").addClass("card-title d-flex justify-content-start").text(data[i].poster_username)
+                                )
+                                .append(
+                                    $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
+                                )
+                                .append(
+                                    $("<p>").addClass("card-text").text(data[i].body)
+                                )
+                            )
+                            .append(
+                                $('<img>').attr("src", base_path+img_src).addClass("card-img-top")
+                            )
                         )
-                    )
+                    }
+                   
                 }
             });
         }        

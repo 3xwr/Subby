@@ -1,6 +1,7 @@
 package service
 
 import (
+	"sort"
 	"time"
 	"user-service/internal/model"
 
@@ -120,6 +121,9 @@ func (s *Content) GetPostsFeedByID(token string) ([]model.Post, error) {
 		return nil, err
 	}
 	posts, err := s.repo.GetUserFeed(userId.Subject(), defaultPostAmount)
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].PostedAt.After(posts[j].PostedAt)
+	})
 	if err != nil {
 		return nil, err
 	}

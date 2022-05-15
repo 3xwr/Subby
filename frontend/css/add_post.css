@@ -16,3 +16,25 @@ form
     margin-top:auto;
     margin-bottom: 5%;
 }
+
+#submit-success{
+    display: none;
+}
+
+#submit-error{
+    display: none;
+}
+
+#preview-label{
+    display: hidden;
+}
+
+#preview{
+    width: 30%;
+    display: hidden;
+}
+
+#img-submit{
+    margin-top:5%;
+    margin-bottom:5%;
+}
