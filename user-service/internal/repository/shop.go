@@ -42,3 +42,17 @@ func (db *Shop) AddItem(item model.ShopItem) error {
 	}
 	return nil
 }
+
+func (db *Shop) DeleteItem(itemID uuid.UUID, ownerID uuid.UUID) error {
+	var iID uuid.UUID
+	err := db.QueryRow("SELECT id FROM shop_items WHERE owner_id = $1 AND id = $2", ownerID, itemID).Scan(&iID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("DELETE FROM shop_items WHERE id=$1", iID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

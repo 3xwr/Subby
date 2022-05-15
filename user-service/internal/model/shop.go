@@ -11,6 +11,17 @@ type ShopItem struct {
 	ImageRef    string    `json:"image_ref"`
 }
 
+type AddItemRequest struct {
+	Name        string `json:"name"`
+	Price       int64  `json:"price"`
+	Description string `json:"rewards"`
+	ImageRef    string `json:"image_ref"`
+}
+
 type GetShopRequest struct {
 	OwnerID uuid.UUID `json:"owner_id"`
+}
+
+type DeleteItemRequest struct {
+	ItemID uuid.UUID `json:"item_id"`
 }

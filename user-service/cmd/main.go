@@ -89,6 +89,7 @@ func main() {
 		r.Method(http.MethodPost, handler.DeleteTierPath, membershipHandler)
 		r.Method(http.MethodPost, handler.ShopPath, shopHandler)
 		r.Method(http.MethodPost, handler.AddItemPath, shopHandler)
+		r.Method(http.MethodPost, handler.DeleteItemPath, shopHandler)
 	})
 
 	srv := http.Server{
