@@ -31,9 +31,7 @@ div.card{
 .card-header {
     position: relative;
 }
-#poster-username{
-    display: block;
-    position: absolute;
-    bottom:0;
-    left: 0;
+#logged-in-user{
+margin-right:3%;
+margin-top:10%;
 }
