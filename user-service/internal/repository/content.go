@@ -122,7 +122,11 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query("SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref FROM posts WHERE poster_id=ANY($1) LIMIT $2", pq.Array(subs), amount)
+	sqlQuery := `SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref, username 
+	FROM posts
+	INNER JOIN users ON posts.poster_id = users.id
+	WHERE poster_id=ANY($1) LIMIT $2`
+	rows, err := db.Query(sqlQuery, pq.Array(subs), amount)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +136,7 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 
 	for rows.Next() {
 		var post model.Post
-		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef); err != nil {
+		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef, &post.PosterUsername); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)

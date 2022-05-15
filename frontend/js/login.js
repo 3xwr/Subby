@@ -19,7 +19,7 @@ $(function () {
         var reduced = data.reduce((acc, {name, value}) => ({...acc, [name]: value}),{}); // form the object
         reduced = JSON.stringify(reduced)
 
-        console.log(reduced)
+        //console.log(reduced)
         
         $.ajax({
             type: "POST",
@@ -27,8 +27,10 @@ $(function () {
             data: reduced,
             success: function(data)
             {
-                console.log(data);
+                //console.log(data.access_token);
                 hideErrorMessage();
+                //document.cookie='access_token='+data.access_token+';domain=;path=/'
+                $.cookie('access_token',data.access_token, {path:'/'})
                 window.location.replace("http://localhost:9080/user_page.html")
             },
             error: function(jqXHR) {
