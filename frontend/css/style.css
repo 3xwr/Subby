@@ -37,3 +37,16 @@ margin-right:3%;
 margin-top:10%;
 }
 
+#poster-data{
+    margin-bottom: 5%;
+    width: max-content;
+}
+
+#post-name{
+    margin-left:2%;
+}
+
+a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+}

@@ -2,6 +2,8 @@ var endpoint = 'http://localhost:8080/posts';
 
 base_path = "http://localhost:9080/img/"
 
+user_path = "http://localhost:9080/img/tux.png"
+
 $.ajax({
     type: "GET",
     url: endpoint,
@@ -38,7 +40,23 @@ $.ajax({
                             .append(
                                 $("<div>").addClass("card-body")
                                 .append(
-                                    $("<h5>").addClass("card-title d-flex justify-content-start").text(data[i].poster_username)
+                                    $("<a>")
+                                    .addClass("d-flex justify-content-start")
+                                    .attr("id","poster-data")
+                                    .attr("href",user_path)
+                                    .append(
+                                        $("<img>")
+                                        .attr("src",base_path+data[i].poster_avatar)
+                                        .addClass("rounded-circle")
+                                        .attr("height","30")
+                                        .attr("width", "30")
+                                        .attr("loading","lazy")
+                                    )
+                                    .append(
+                                        $("<h5>")
+                                        .text(data[i].poster_username)
+                                        .attr("id","post-name")
+                                    )
                                 )
                                 .append(
                                     $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
@@ -55,8 +73,25 @@ $.ajax({
                             .append(
                                 $("<div>").addClass("card-body")
                                 .append(
-                                    $("<h5>").addClass("card-title d-flex justify-content-start").text(data[i].poster_username)
+                                    $("<a>")
+                                    .addClass("d-flex justify-content-start")
+                                    .attr("id","poster-data")
+                                    .attr("href",user_path)
+                                    .append(
+                                        $("<img>")
+                                        .attr("src",base_path+data[i].poster_avatar)
+                                        .addClass("rounded-circle")
+                                        .attr("height","30")
+                                        .attr("width", "30")
+                                        .attr("loading","lazy")
+                                    )
+                                    .append(
+                                        $("<h5>")
+                                        .text(data[i].poster_username)
+                                        .attr("id","post-name")
+                                    )
                                 )
+
                                 .append(
                                     $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
                                 )

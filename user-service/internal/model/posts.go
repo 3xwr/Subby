@@ -22,6 +22,7 @@ type Post struct {
 	PostedAt         time.Time `json:"posted_at"`
 	PosterID         uuid.UUID `json:"poster_id"`
 	PosterUsername   string    `json:"poster_username"`
+	PosterAvatarRef  string    `json:"poster_avatar"`
 	Body             *string   `json:"body"`
 	MembershipLocked bool      `json:"Membership_locked"`
 	MembershipTier   *int      `json:"Membership_tier,omitempty"`
