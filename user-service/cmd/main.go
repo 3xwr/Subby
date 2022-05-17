@@ -94,6 +94,8 @@ func main() {
 		r.Method(http.MethodPost, handler.AddItemPath, shopHandler)
 		r.Method(http.MethodPost, handler.DeleteItemPath, shopHandler)
 		r.Method(http.MethodPost, handler.UserDataPath, userHandler)
+		r.Method(http.MethodPost, handler.IDByNamePath, userHandler)
+		r.Method(http.MethodPost, handler.CheckSubPath, subscriptionsHandler)
 	})
 
 	srv := http.Server{

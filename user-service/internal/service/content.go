@@ -24,6 +24,7 @@ type ContentRepo interface {
 	SaveNewPost(model.Post) error
 	DeletePostFromDB(string, string) error
 	GetUserFeed(string, int) ([]model.Post, error)
+	CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error)
 }
 
 func NewContent(logger *zerolog.Logger, repo ContentRepo, secret string) *Content {
@@ -72,6 +73,14 @@ func (s *Content) UnsubscribeFromUser(unsubbingUserToken string, unsubscribeFrom
 		return err
 	}
 	return nil
+}
+
+func (s *Content) CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error) {
+	subbed, err := s.repo.CheckSubscribe(subbingUser, checkUser)
+	if err != nil {
+		return false, err
+	}
+	return subbed, err
 }
 
 func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest) error {

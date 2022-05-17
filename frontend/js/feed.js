@@ -4,6 +4,8 @@ base_path = "http://localhost:9080/img/"
 
 user_path = "http://localhost:9080/img/tux.png"
 
+profile_base_path = "http://localhost:9080/user_profile.html?user="
+
 $.ajax({
     type: "GET",
     url: endpoint,
@@ -43,7 +45,7 @@ $.ajax({
                                     $("<a>")
                                     .addClass("d-flex justify-content-start")
                                     .attr("id","poster-data")
-                                    .attr("href",user_path)
+                                    .attr("href",profile_base_path+data[i].poster_username)
                                     .append(
                                         $("<img>")
                                         .attr("src",base_path+data[i].poster_avatar)
@@ -76,7 +78,7 @@ $.ajax({
                                     $("<a>")
                                     .addClass("d-flex justify-content-start")
                                     .attr("id","poster-data")
-                                    .attr("href",user_path)
+                                    .attr("href",profile_base_path+data[i].poster_username)
                                     .append(
                                         $("<img>")
                                         .attr("src",base_path+data[i].poster_avatar)

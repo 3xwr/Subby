@@ -12,6 +12,7 @@ import (
 
 const (
 	UserDataPath = "/userdata"
+	IDByNamePath = "/useridbyname"
 )
 
 type User struct {
@@ -21,6 +22,8 @@ type User struct {
 
 type UserService interface {
 	GetUserPublicData(userID uuid.UUID) (model.User, error)
+	GetUserID(name string) (uuid.UUID, error)
+	GetFullUserPublicData(userID uuid.UUID) (model.User, error)
 }
 
 func NewUser(logger *zerolog.Logger, srv UserService) *User {
@@ -40,11 +43,42 @@ func (h *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
 				return
 			}
-			user, err := h.service.GetUserPublicData(userRequest.UserID)
+			if userRequest.FullInfo {
+				user, err := h.service.GetFullUserPublicData(userRequest.UserID)
+				if err != nil {
+					h.logger.Error().Err(err).Msg("Invalid incoming data")
+					writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+					return
+				}
+				writeResponse(w, http.StatusOK, user)
+			} else {
+				user, err := h.service.GetUserPublicData(userRequest.UserID)
+				if err != nil {
+					h.logger.Error().Err(err).Msg("Invalid incoming data")
+					writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+					return
+				}
+				writeResponse(w, http.StatusOK, user)
+			}
+
+		}
+		if r.URL.String() == IDByNamePath {
+			var idRequest model.UserIDRequest
+			err := json.NewDecoder(r.Body).Decode(&idRequest)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
 				return
+			}
+			id, err := h.service.GetUserID(idRequest.Username)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			user := model.UserIDResponse{
+				Username: idRequest.Username,
+				UserID:   id,
 			}
 			writeResponse(w, http.StatusOK, user)
 		}

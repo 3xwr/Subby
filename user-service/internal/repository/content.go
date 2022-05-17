@@ -96,6 +96,19 @@ func (db *Content) RemoveUserSubscription(currentUser string, userToUnsubscribeF
 	return nil
 }
 
+func (db *Content) CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error) {
+	var sUser uuid.UUID
+	var cUser uuid.UUID
+	err := db.QueryRow("SELECT user_id, subbed_to_user_id FROM user_subs WHERE user_id = $1 AND subbed_to_user_id = $2", subbingUser, checkUser).Scan(&sUser, &cUser)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
 func (db *Content) SaveNewPost(post model.Post) error {
 	_, err := db.Exec("INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)", post.PostID, post.PostedAt, post.PosterID, post.Body, post.MembershipLocked, post.MembershipTier, post.ImageRef)
 	if err != nil {

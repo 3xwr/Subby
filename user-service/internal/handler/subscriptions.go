@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"user-service/internal/model"
 
+	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
 )
@@ -13,6 +14,7 @@ const (
 	SubscriptionsPath = "/subscriptions"
 	SubscribePath     = "/subscribe"
 	UnsubscribePath   = "/unsubscribe"
+	CheckSubPath      = "/checksub"
 )
 
 type Subscriptions struct {
@@ -31,6 +33,7 @@ type SubscriptionsService interface {
 	GetUserSubscriptionList(string) ([]string, error)
 	SubscribeCurrentUserToUser(string, string) error
 	UnsubscribeFromUser(string, string) error
+	CheckSubscribe(uuid.UUID, uuid.UUID) (bool, error)
 }
 
 func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -51,14 +54,13 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
+		userId, err := jwt.ParseString(userIDToken)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("Invalid incoming data")
+			writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+			return
+		}
 		if r.URL.String() == SubscribePath {
-			userId, err := jwt.ParseString(userIDToken)
-			if err != nil {
-				h.logger.Error().Err(err).Msg("Invalid incoming data")
-				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-				return
-			}
-
 			var u model.User
 			err = json.NewDecoder(r.Body).Decode(&u)
 			if err != nil {
@@ -80,13 +82,6 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusOK, resp)
 		}
 		if r.URL.String() == UnsubscribePath {
-			userId, err := jwt.ParseString(userIDToken)
-			if err != nil {
-				h.logger.Error().Err(err).Msg("Invalid incoming data")
-				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-				return
-			}
-
 			var u model.User
 			err = json.NewDecoder(r.Body).Decode(&u)
 			if err != nil {
@@ -104,6 +99,25 @@ func (h *Subscriptions) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Subscriber:   userId.Subject(),
 				Unsubscribed: u.ID.String(),
 				UnsubSuccess: true,
+			}
+			writeResponse(w, http.StatusOK, resp)
+		}
+		if r.URL.String() == CheckSubPath {
+			var u model.CheckSubscriptionRequest
+			err = json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			subscribed, err := h.service.CheckSubscribe(u.Subscriber, u.Subscribed)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			resp := model.CheckSubscriptionResponse{
+				Subscribed: subscribed,
 			}
 			writeResponse(w, http.StatusOK, resp)
 		}
