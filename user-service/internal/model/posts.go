@@ -17,6 +17,10 @@ type PostDeleteRequest struct {
 	PostID uuid.UUID `json:"post_id"`
 }
 
+type GetUserPostsRequest struct {
+	PosterID uuid.UUID `json:"poster_id"`
+}
+
 type Post struct {
 	PostID           uuid.UUID `json:"post_id"`
 	PostedAt         time.Time `json:"posted_at"`

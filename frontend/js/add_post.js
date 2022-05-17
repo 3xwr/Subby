@@ -6,6 +6,11 @@ function showMessage(id) {
     document.getElementById(id).style.display = "block";
 }
 
+token = $.cookie('access_token')
+if (token===undefined) {
+    window.location.replace("http://localhost:9080/login.html")
+}
+
 const upload_url = "http://localhost:8080/upload"
 const post_submit_url = "http://localhost:8080/post"
 let img_address = ''

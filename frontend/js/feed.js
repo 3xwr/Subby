@@ -19,7 +19,7 @@ $.ajax({
             .append(
                 $("<div>")
                 .addClass("font-monospace")
-                .text("No posts in your feed. Subscribe to somebody!")
+                .text("Нет записей. Подпишитесь на кого-нибудь!")
             )
         } else {
             console.log(data);
@@ -28,7 +28,7 @@ $.ajax({
                     let img_src = data[i].image_ref
                     posted_at = data[i].posted_at
                     date = new Date(posted_at)
-                    const formattedDate = date.toLocaleString("en-GB", {
+                    const formattedDate = date.toLocaleString("ru", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",
@@ -113,7 +113,6 @@ $.ajax({
     },
     error: function(jqXHR) {
         if (jqXHR.status === 403 || jqXHR.status === 401) {
-            alert('403 or 401');
             window.location.replace("http://localhost:9080/login.html");
         }
     }

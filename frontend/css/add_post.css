@@ -43,3 +43,8 @@ form
     margin-top:5%;
     margin-bottom:5%;
 }
+
+a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    color: inherit;
+}

@@ -157,3 +157,27 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 
 	return posts, nil
 }
+
+func (db *Content) GetUserPosts(posterID uuid.UUID, amount int) ([]model.Post, error) {
+	sqlQuery := `SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref, username, avatar_ref 
+	FROM posts
+	INNER JOIN users ON posts.poster_id = users.id
+	WHERE poster_id=$1 LIMIT $2`
+	rows, err := db.Query(sqlQuery, posterID, amount)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []model.Post
+
+	for rows.Next() {
+		var post model.Post
+		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef, &post.PosterUsername, &post.PosterAvatarRef); err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}

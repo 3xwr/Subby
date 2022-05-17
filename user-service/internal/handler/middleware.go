@@ -57,6 +57,7 @@ func JWT(secret []byte) func(http.Handler) http.Handler {
 			case "/register":
 			case UserDataPath:
 			case IDByNamePath:
+			case UserPostsPath:
 			default:
 				authHeader := r.Header.Get("Authorization")
 				if len(authHeader) == 0 {

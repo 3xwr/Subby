@@ -46,6 +46,10 @@ margin-top:10%;
     margin-left:2%;
 }
 
+#search-bar{
+   height:10px;
+}
+
 a, a:hover, a:focus, a:active {
     text-decoration: none;
     color: inherit;
