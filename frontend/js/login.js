@@ -31,7 +31,7 @@ $(function () {
                 hideErrorMessage();
                 //document.cookie='access_token='+data.access_token+';domain=;path=/'
                 $.cookie('access_token',data.access_token, {path:'/'})
-                window.location.replace("http://localhost:9080/user_page.html")
+                window.location.replace("http://localhost:9080/feed.html")
             },
             error: function(jqXHR) {
                 if (jqXHR.status === 403) {

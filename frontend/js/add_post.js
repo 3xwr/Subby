@@ -93,7 +93,7 @@ $(function () {
                 {
                     showMessage("submit-success")
                     window.setTimeout(function(){
-                        window.location.replace("http://localhost:9080/user_page.html");
+                        window.location.replace("http://localhost:9080/feed.html");
                     },1000);
                 },
                 error: function(e) {
@@ -115,7 +115,7 @@ $(function () {
                 {
                     showMessage("submit-success")
                     window.setTimeout(function(){
-                        window.location.replace("http://localhost:9080/user_page.html");
+                        window.location.replace("http://localhost:9080/feed.html");
                     },1000);
                 },
                 error: function(e) {

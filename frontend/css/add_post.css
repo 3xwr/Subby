@@ -34,6 +34,11 @@ form
     display: hidden;
 }
 
+#logged-in-user{
+    margin-right:3%;
+    margin-top:10%;
+    }
+
 #img-submit{
     margin-top:5%;
     margin-bottom:5%;
