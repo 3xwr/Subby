@@ -20,7 +20,7 @@ CREATE TABLE posts (
     poster_id uuid NOT NULL REFERENCES users(id),
     body varchar,
     membership_locked boolean NOT NULL,
-    membership_tier integer,
+    membership_tier uuid,
     image_ref varchar,
     PRIMARY KEY(post_id)
 );
@@ -70,7 +70,8 @@ INSERT INTO user_subs (sub_id, user_id, subbed_to_user_id) VALUES ('e7afd1e4-ce3
 INSERT INTO user_subs (sub_id, user_id, subbed_to_user_id) VALUES ('e7afd1e4-ce3b-11ec-9d64-0242ac120004', 'abd4528d-cd53-4366-83a7-1a12739904f5', 'abd4528d-cd53-4366-83a7-1a12739904f5');
 INSERT INTO user_subs (sub_id, user_id, subbed_to_user_id) VALUES ('e7afd1e4-ce3b-11ec-9d64-0242ac120003', 'c03867f8-0f7c-4aef-8ff6-16ab6aa24215', 'c03867f8-0f7c-4aef-8ff6-16ab6aa24215');
 INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked, image_ref) VALUES ('3994378e-a378-4d9d-a367-a9104f2a3c43','2014-04-04 06:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','first ever Subby post!', false,'flower.png');
-INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked, image_ref) VALUES ('3994378e-a378-4d9d-a367-a9104fff3c43','2014-04-04 07:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','second Subby post!', false,'tux.png');
+INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked, image_ref) VALUES ('3994378e-a378-4d9d-a367-a9104f2a3c87','2022-08-08 06:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','first ever Subby post!', false,'flower.png');
+INSERT INTO posts (post_id, posted_at, poster_id, body, membership_locked,membership_tier, image_ref) VALUES ('3994378e-a378-4d9d-a367-a9104fff3c43','2014-04-04 07:00:00','0622dea2-ee79-4aa9-8560-b3ba5a09fa26','second Subby post!', true,'540722b9-9bd9-4fe4-896b-fc7985cdc6bc','tux.png');
 INSERT INTO memberships (id, owner_id) VALUES ('096c791f-f42b-4fa6-a303-0046e6c09b15','abd4528d-cd53-4366-83a7-1a12739904f5');
 INSERT INTO memberships (id, owner_id) VALUES ('096c791f-f42b-4fa6-a303-0046e6c09b16','c03867f8-0f7c-4aef-8ff6-16ab6aa24215');
 INSERT INTO tiers (id, name, price, rewards, image_ref, membership_id) VALUES ('540722b9-9bd9-4fe4-896b-fc7985cdc6bb', 'Biggest Fan', 2000, 'Shoutout at the end of the video','dog.png','096c791f-f42b-4fa6-a303-0046e6c09b15');

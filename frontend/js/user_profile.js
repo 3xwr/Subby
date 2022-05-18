@@ -183,6 +183,7 @@ $.ajax({
                     data:userPostsRequest,
                     success: function(data)
                     {    
+                        console.log(data)
                         for (let i = 0; i < data.length;i++) {
                             let img_src = data[i].image_ref
                             posted_at = data[i].posted_at

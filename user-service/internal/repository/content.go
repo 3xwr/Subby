@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
@@ -153,6 +154,71 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 			return nil, err
 		}
 		posts = append(posts, post)
+	}
+
+	sqlGetAllTiersQuery := `SELECT tiers.id, tiers.name
+	FROM tiers`
+	tierRows, err := db.Query(sqlGetAllTiersQuery)
+	if err != nil {
+		return nil, err
+	}
+	defer tierRows.Close()
+
+	tierToName := make(map[uuid.UUID]string)
+	for tierRows.Next() {
+		var tier model.MembershipTier
+		if err := tierRows.Scan(&tier.ID, &tier.Name); err != nil {
+			return nil, err
+		}
+		tierToName[tier.ID] = tier.Name
+	}
+
+	sqlMembershipCheckQuery := `SELECT tiers.id, tiers.name, tiers.price, tiers.rewards, tiers.image_ref
+	FROM members
+	INNER JOIN tiers ON members.tier_id = tiers.id
+	WHERE user_id=$1`
+
+	checkRows, err := db.Query(sqlMembershipCheckQuery, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer checkRows.Close()
+
+	var tiers []model.MembershipTier
+	for checkRows.Next() {
+		var tier model.MembershipTier
+		if err := checkRows.Scan(&tier.ID, &tier.Name, &tier.Price, &tier.Rewards, &tier.ImageRef); err != nil {
+			return nil, err
+		}
+		tiers = append(tiers, tier)
+	}
+
+	fmt.Println(tiers)
+	fmt.Println(tierToName)
+
+	for i, post := range posts {
+		if post.MembershipLocked {
+			locked := true
+			for _, tier := range tiers {
+				fmt.Println(tier)
+				t1 := post.MembershipTier.String()
+				t2 := tier.ID.String()
+				if t1 == t2 {
+					locked = false
+					break
+				}
+			}
+			fmt.Println(post.MembershipTier, locked)
+			if locked {
+				text := "Нужен уровень подписки:" + tierToName[*post.MembershipTier]
+				post.Body = &text
+				if post.ImageRef != nil {
+					imageRef := "lock.jpeg"
+					post.ImageRef = &imageRef
+				}
+				posts[i] = post
+			}
+		}
 	}
 
 	return posts, nil
