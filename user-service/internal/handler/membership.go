@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	MembershipPath       = "/membership"
-	CreateMembershipPath = "/createmembership"
-	DeleteMembershipPath = "/deletemembership"
-	AddTierPath          = "/addtier"
-	DeleteTierPath       = "/deletetier"
+	MembershipIDByOwnerIDPath = "/membershipowner"
+	MembershipPath            = "/membership"
+	CreateMembershipPath      = "/createmembership"
+	DeleteMembershipPath      = "/deletemembership"
+	AddTierPath               = "/addtier"
+	DeleteTierPath            = "/deletetier"
 )
 
 type Membership struct {
@@ -30,6 +31,7 @@ func NewMembership(logger *zerolog.Logger, srv MembershipService) *Membership {
 }
 
 type MembershipService interface {
+	GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error)
 	GetMembershipInfo(string) (model.Membership, error)
 	CreateMembership(model.CreateMembershipRequest, string) error
 	DeleteMembership(string, uuid.UUID) error
@@ -38,16 +40,32 @@ type MembershipService interface {
 }
 
 func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userIDToken, err := getUserID(r)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("Invalid incoming data")
-		writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-		return
-	}
 	if r.Method == http.MethodPost {
+		if r.URL.String() == MembershipIDByOwnerIDPath {
+			var idRequest model.MembershipIDByOwnerIDRequest
+			err := json.NewDecoder(r.Body).Decode(&idRequest)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			membershipID, err := h.service.GetMembershipIDByOwnerID(idRequest.OwnerID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad request"})
+				return
+			}
+			writeResponse(w, http.StatusOK, model.MembershipIdResponse{MembershipID: membershipID})
+		}
 		if r.URL.String() == AddTierPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var mCreateRequest model.CreateTierRequest
-			err := json.NewDecoder(r.Body).Decode(&mCreateRequest)
+			err = json.NewDecoder(r.Body).Decode(&mCreateRequest)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
@@ -61,8 +79,14 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if r.URL.String() == CreateMembershipPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var mCreateRequest model.CreateMembershipRequest
-			err := json.NewDecoder(r.Body).Decode(&mCreateRequest)
+			err = json.NewDecoder(r.Body).Decode(&mCreateRequest)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
@@ -92,8 +116,14 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusOK, membership)
 		}
 		if r.URL.String() == DeleteMembershipPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var mRequest model.MembershipRequest
-			err := json.NewDecoder(r.Body).Decode(&mRequest)
+			err = json.NewDecoder(r.Body).Decode(&mRequest)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
@@ -107,8 +137,14 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if r.URL.String() == DeleteTierPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var deleteTierRequest model.DeleteTierRequest
-			err := json.NewDecoder(r.Body).Decode(&deleteTierRequest)
+			err = json.NewDecoder(r.Body).Decode(&deleteTierRequest)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})

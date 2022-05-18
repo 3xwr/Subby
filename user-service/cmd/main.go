@@ -97,6 +97,7 @@ func main() {
 		r.Method(http.MethodPost, handler.IDByNamePath, userHandler)
 		r.Method(http.MethodPost, handler.CheckSubPath, subscriptionsHandler)
 		r.Method(http.MethodPost, handler.UserPostsPath, postsHandler)
+		r.Method(http.MethodPost, handler.MembershipIDByOwnerIDPath, membershipHandler)
 	})
 
 	srv := http.Server{

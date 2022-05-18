@@ -14,6 +14,7 @@ type Membership struct {
 }
 
 type MembershipRepo interface {
+	GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error)
 	GetMembershipInfo(string) (model.Membership, error)
 	CreateMembership(model.Membership) error
 	DeleteMembership(uuid.UUID, uuid.UUID) error
@@ -26,6 +27,14 @@ func NewMembership(logger *zerolog.Logger, repo MembershipRepo) *Membership {
 		logger: logger,
 		repo:   repo,
 	}
+}
+
+func (s *Membership) GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error) {
+	id, err := s.repo.GetMembershipIDByOwnerID(OwnerID)
+	if err != nil {
+		return id, err
+	}
+	return id, nil
 }
 
 func (s *Membership) GetMembershipInfo(membershipID string) (model.Membership, error) {

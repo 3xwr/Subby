@@ -48,3 +48,7 @@ a, a:hover, a:focus, a:active {
     text-decoration: none;
     color: inherit;
 }
+
+div.form {
+    background-color: rgba(249,249,249,var(--mdb-bg-opacity))!important
+}

@@ -19,6 +19,14 @@ type CreateMembershipRequest struct {
 	Tiers []CreateTierRequest `json:"tiers"`
 }
 
+type MembershipIDByOwnerIDRequest struct {
+	OwnerID uuid.UUID `json:"owner_id"`
+}
+
+type MembershipIdResponse struct {
+	MembershipID uuid.UUID `json:"membership_id"`
+}
+
 type DeleteTierRequest struct {
 	TierID uuid.UUID `json:"tier_id"`
 }

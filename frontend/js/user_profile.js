@@ -27,6 +27,7 @@ userIDRequestJSON = JSON.stringify(userIDRequestJSON)
 
 let token = $.cookie('access_token')
 var userPageID
+var membershipID
 let subbed = true
 
 
@@ -182,7 +183,6 @@ $.ajax({
                     data:userPostsRequest,
                     success: function(data)
                     {    
-                        console.log(data)
                         for (let i = 0; i < data.length;i++) {
                             let img_src = data[i].image_ref
                             posted_at = data[i].posted_at
@@ -284,6 +284,117 @@ $.ajax({
     error: function(jqXHR) {
     }
 });
+
+
+async function getUserIDByUsername(username) {
+    return new Promise((resolve, reject) => {
+        userIDByNamePath = "http://localhost:8080/useridbyname"
+        userIDRequestJSON = JSON.parse('{"username":"'+username+'"}')
+        userIDRequestJSON = JSON.stringify(userIDRequestJSON)
+        $.ajax({
+            type: "POST",
+            url: userIDByNamePath,
+            data: userIDRequestJSON,
+            headers: {
+                "Content-type":"application/json"
+            },
+            success: function(data)
+            {
+                resolve(data.user_id)
+            }
+        });
+    })
+}
+
+//get user membership tiers
+async function getMembershipIDByOwnerID(id){
+    return new Promise((resolve, reject) => {
+        let membershipOwnerPath = "http://localhost:8080/membershipowner"
+        let ownerIDJSON = '{"owner_id":"'+id+'"}'
+        $.ajax({
+            type: "POST",
+            url: membershipOwnerPath,
+            data: ownerIDJSON,
+            success: function(data)
+            {
+                resolve(data.membership_id)
+            }
+        });
+    })
+}
+
+async function getMembershipDataByID(id) {
+    return new Promise((resolve, reject) => {
+        let membershipPath = "http://localhost:8080/membership"
+        let membershipIDJSON = '{"membership_id":"'+id+'"}'
+        $.ajax({
+            type: "POST",
+            url: membershipPath,
+            data: membershipIDJSON,
+            success: function(data)
+            {
+                resolve(data)
+            }
+        });
+    })
+}
+
+function buildTierDivs(membership_data, current_user_membership_status) {
+    for (let i = 0; i < membership_data.tiers.length;i++) {
+        console.log(membership_data.tiers[i])
+        $("#membership-tiers")
+        .append(
+            $("<li>")
+            .addClass("list-group-item px-3 tier")
+            .attr("id","tier"+i)
+            .append(
+                $("<h5>","")
+                .attr("id","tier-name")
+                .text(membership_data.tiers[i].name)
+            )
+            .append(
+                $("<h6>")
+                .attr("id","tier-name")
+                .addClass("text-muted")
+                .text(membership_data.tiers[i].price+"₽ в месяц")
+            )
+        )
+        if(membership_data.tiers[i].image_ref !== undefined) {
+            imgBasePath = "http://localhost:9080/img/"
+            $("#tier"+i)
+            .append(
+                $("<img>")
+                .attr("id","tier-img")
+                .attr("src",imgBasePath+membership_data.tiers[i].image_ref)
+            )
+        }
+        $("#tier"+i)
+        .append(
+            $("<p>")
+            .addClass("card-text")
+            .text(membership_data.tiers[i].rewards)
+        )
+        if(!current_user_membership_status) {
+            $("#tier"+i)
+            .append(
+                $("<a>")
+                .addClass("btn btn-primary")
+                .text('Подписаться')
+            )
+        }
+    }
+}
+
+
+async function getUserTiers() {
+    owner_id = await getUserIDByUsername(username)
+    membership_id = await getMembershipIDByOwnerID(owner_id)
+    membership_data = await getMembershipDataByID(membership_id)
+    buildTierDivs(membership_data)
+}
+
+getUserTiers()
+
 
 function subscribeButtonClickListener() {
     $("#sub_button").off();
