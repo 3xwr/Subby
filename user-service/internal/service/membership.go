@@ -114,10 +114,11 @@ func (s *Membership) AddTier(tierCreateRequest model.CreateTierRequest, token st
 		return err
 	}
 	tier := model.MembershipTier{
-		ID:      TierID,
-		Name:    tierCreateRequest.Name,
-		Price:   tierCreateRequest.Price,
-		Rewards: tierCreateRequest.Rewards,
+		ID:       TierID,
+		Name:     tierCreateRequest.Name,
+		Price:    tierCreateRequest.Price,
+		Rewards:  tierCreateRequest.Rewards,
+		ImageRef: tierCreateRequest.ImageRef,
 	}
 	err = s.repo.AddTier(tier, ownerID)
 	if err != nil {

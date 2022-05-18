@@ -25,6 +25,7 @@ $.ajax({
             console.log(data);
             $(document).ready(function(){
                 for (let i = 0; i < data.length;i++) {
+                    let post_id = "post_"+i
                     let img_src = data[i].image_ref
                     posted_at = data[i].posted_at
                     date = new Date(posted_at)
@@ -59,6 +60,7 @@ $.ajax({
                                         .text(data[i].poster_username)
                                         .attr("id","post-name")
                                     )
+                                    .attr("id",post_id)
                                 )
                                 .append(
                                     $("<h6>").text(formattedDate).addClass("card-subtitle mb-2 text-muted d-flex justify-content-start")
@@ -92,6 +94,7 @@ $.ajax({
                                         .text(data[i].poster_username)
                                         .attr("id","post-name")
                                     )
+                                    .attr("id",post_id)
                                 )
 
                                 .append(
@@ -106,7 +109,15 @@ $.ajax({
                             )
                         )
                     }
-                   
+                   if (data[i].Membership_locked) {
+                       lockPath = "http://localhost:9080/img/post-lock-icon.png"
+                        $("#"+post_id)
+                        .append(
+                            $("<img>")
+                            .attr("src",lockPath)
+                            .attr("id", "locked-post")
+                        )
+                   }
                 }
             });
         }        

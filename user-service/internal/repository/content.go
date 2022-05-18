@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
@@ -193,14 +192,10 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 		tiers = append(tiers, tier)
 	}
 
-	fmt.Println(tiers)
-	fmt.Println(tierToName)
-
 	for i, post := range posts {
 		if post.MembershipLocked {
 			locked := true
 			for _, tier := range tiers {
-				fmt.Println(tier)
 				t1 := post.MembershipTier.String()
 				t2 := tier.ID.String()
 				if t1 == t2 {
@@ -208,7 +203,6 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 					break
 				}
 			}
-			fmt.Println(post.MembershipTier, locked)
 			if locked {
 				text := "Нужен уровень подписки:" + tierToName[*post.MembershipTier]
 				post.Body = &text
@@ -224,26 +218,140 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 	return posts, nil
 }
 
-func (db *Content) GetUserPosts(posterID uuid.UUID, amount int) ([]model.Post, error) {
-	sqlQuery := `SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref, username, avatar_ref 
-	FROM posts
-	INNER JOIN users ON posts.poster_id = users.id
-	WHERE poster_id=$1 LIMIT $2`
-	rows, err := db.Query(sqlQuery, posterID, amount)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var posts []model.Post
-
-	for rows.Next() {
-		var post model.Post
-		if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef, &post.PosterUsername, &post.PosterAvatarRef); err != nil {
+func (db *Content) GetUserPosts(posterID uuid.UUID, loggedInID *uuid.UUID, amount int) ([]model.Post, error) {
+	if loggedInID != nil {
+		sqlQuery := `SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref, username, avatar_ref 
+		FROM posts
+		INNER JOIN users ON posts.poster_id = users.id
+		WHERE poster_id=$1 LIMIT $2`
+		rows, err := db.Query(sqlQuery, posterID, amount)
+		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, post)
-	}
+		defer rows.Close()
 
-	return posts, nil
+		var posts []model.Post
+
+		for rows.Next() {
+			var post model.Post
+			if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef, &post.PosterUsername, &post.PosterAvatarRef); err != nil {
+				return nil, err
+			}
+			posts = append(posts, post)
+		}
+
+		sqlGetAllTiersQuery := `SELECT tiers.id, tiers.name
+		FROM tiers`
+		tierRows, err := db.Query(sqlGetAllTiersQuery)
+		if err != nil {
+			return nil, err
+		}
+		defer tierRows.Close()
+
+		tierToName := make(map[uuid.UUID]string)
+		for tierRows.Next() {
+			var tier model.MembershipTier
+			if err := tierRows.Scan(&tier.ID, &tier.Name); err != nil {
+				return nil, err
+			}
+			tierToName[tier.ID] = tier.Name
+		}
+
+		sqlMembershipCheckQuery := `SELECT tiers.id, tiers.name, tiers.price, tiers.rewards, tiers.image_ref
+		FROM members
+		INNER JOIN tiers ON members.tier_id = tiers.id
+		WHERE user_id=$1`
+
+		checkRows, err := db.Query(sqlMembershipCheckQuery, loggedInID)
+		if err != nil {
+			return nil, err
+		}
+		defer checkRows.Close()
+
+		var tiers []model.MembershipTier
+		for checkRows.Next() {
+			var tier model.MembershipTier
+			if err := checkRows.Scan(&tier.ID, &tier.Name, &tier.Price, &tier.Rewards, &tier.ImageRef); err != nil {
+				return nil, err
+			}
+			tiers = append(tiers, tier)
+		}
+
+		for i, post := range posts {
+			if post.MembershipLocked {
+				locked := true
+				if posterID == *loggedInID {
+					locked = false
+				}
+				for _, tier := range tiers {
+					t1 := post.MembershipTier.String()
+					t2 := tier.ID.String()
+					if t1 == t2 {
+						locked = false
+						break
+					}
+				}
+				if locked {
+					text := "Нужен уровень подписки:" + tierToName[*post.MembershipTier]
+					post.Body = &text
+					if post.ImageRef != nil {
+						imageRef := "lock.jpeg"
+						post.ImageRef = &imageRef
+					}
+					posts[i] = post
+				}
+			}
+		}
+		return posts, nil
+	} else {
+		sqlQuery := `SELECT post_id, posted_at, poster_id, body, membership_locked, membership_tier, image_ref, username, avatar_ref 
+		FROM posts
+		INNER JOIN users ON posts.poster_id = users.id
+		WHERE poster_id=$1 LIMIT $2`
+		rows, err := db.Query(sqlQuery, posterID, amount)
+		if err != nil {
+			return nil, err
+		}
+		defer rows.Close()
+
+		var posts []model.Post
+
+		for rows.Next() {
+			var post model.Post
+			if err := rows.Scan(&post.PostID, &post.PostedAt, &post.PosterID, &post.Body, &post.MembershipLocked, &post.MembershipTier, &post.ImageRef, &post.PosterUsername, &post.PosterAvatarRef); err != nil {
+				return nil, err
+			}
+			posts = append(posts, post)
+		}
+
+		sqlGetAllTiersQuery := `SELECT tiers.id, tiers.name
+		FROM tiers`
+		tierRows, err := db.Query(sqlGetAllTiersQuery)
+		if err != nil {
+			return nil, err
+		}
+		defer tierRows.Close()
+
+		tierToName := make(map[uuid.UUID]string)
+		for tierRows.Next() {
+			var tier model.MembershipTier
+			if err := tierRows.Scan(&tier.ID, &tier.Name); err != nil {
+				return nil, err
+			}
+			tierToName[tier.ID] = tier.Name
+		}
+
+		for i, post := range posts {
+			if post.MembershipLocked {
+				text := "Нужен уровень подписки:" + tierToName[*post.MembershipTier]
+				post.Body = &text
+				if post.ImageRef != nil {
+					imageRef := "lock.jpeg"
+					post.ImageRef = &imageRef
+				}
+				posts[i] = post
+			}
+		}
+		return posts, nil
+	}
 }

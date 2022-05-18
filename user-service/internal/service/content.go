@@ -25,7 +25,7 @@ type ContentRepo interface {
 	DeletePostFromDB(string, string) error
 	GetUserFeed(string, int) ([]model.Post, error)
 	CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error)
-	GetUserPosts(uuid.UUID, int) ([]model.Post, error)
+	GetUserPosts(uuid.UUID, *uuid.UUID, int) ([]model.Post, error)
 }
 
 func NewContent(logger *zerolog.Logger, repo ContentRepo, secret string) *Content {
@@ -140,8 +140,8 @@ func (s *Content) GetPostsFeedByID(token string) ([]model.Post, error) {
 	return posts, nil
 }
 
-func (s *Content) GetUserPosts(posterID uuid.UUID) ([]model.Post, error) {
-	posts, err := s.repo.GetUserPosts(posterID, defaultPostAmount)
+func (s *Content) GetUserPosts(posterID uuid.UUID, loggedInID *uuid.UUID) ([]model.Post, error) {
+	posts, err := s.repo.GetUserPosts(posterID, loggedInID, defaultPostAmount)
 	if err != nil {
 		return nil, err
 	}

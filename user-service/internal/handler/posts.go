@@ -6,6 +6,7 @@ import (
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
+	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
 )
 
@@ -30,7 +31,7 @@ func NewPosts(logger *zerolog.Logger, srv PostsService) *Posts {
 
 type PostsService interface {
 	GetPostsFeedByID(string) ([]model.Post, error)
-	GetUserPosts(uuid.UUID) ([]model.Post, error)
+	GetUserPosts(posterID uuid.UUID, loggedInID *uuid.UUID) ([]model.Post, error)
 	SubmitPost(string, model.PostSubmitRequest) error
 	DeletePost(string, string) error
 }
@@ -102,7 +103,25 @@ func (h *Posts) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
 				return
 			}
-			posts, err := h.service.GetUserPosts(req.PosterID)
+			var loggedInID *uuid.UUID
+			userID, err := getUserID(r)
+			if err != nil {
+				loggedInID = nil
+			} else {
+				jwt, err := jwt.ParseString(userID)
+				if err != nil {
+					loggedInID = nil
+				} else {
+					parsed, err := uuid.Parse(jwt.Subject())
+					if err != nil {
+						h.logger.Error().Err(err).Msg("Error on logged in user ID parse.")
+						writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+						return
+					}
+					loggedInID = &parsed
+				}
+			}
+			posts, err := h.service.GetUserPosts(req.PosterID, loggedInID)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Error while deleting post"})

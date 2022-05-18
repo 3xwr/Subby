@@ -73,3 +73,10 @@ a, a:hover, a:focus, a:active {
     float:left;
     width:33%;
 }
+
+#locked-post {
+    padding-top: 5px;
+    padding-left: 5px;
+    width:20px;
+    height: 20px;
+}
