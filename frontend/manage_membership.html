@@ -62,10 +62,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link only-logged-in" href="manage_membership.html">Управление подпиской</a>
-          </li>
+          </li> 
           <li class="nav-item">
             <div class="input-group">
               <div class="form-outline">
+                <input type="text" style="display:none">
+                <input type="password" style="display:none">
                 <input id="search-input" type="search" id="form1" class="form-control" />
                 <label class="form-label" for="form1">Поиск</label>
               </div>
@@ -88,15 +90,27 @@
     <!-- Container wrapper -->
   </nav>
   <!-- Navbar -->
-  <div class="form" name="add-post-form">
+  <div class="form" name="add-tier-form" autocomplete="off">
+<input type="text" style="display:none">
+<input type="password" style="display:none">
   <form id="upload-form">
+
+    <div class="form-outline mb-4">
+      <input type="text" name="name" id="tier-name" class="form-control" />
+      <label class="form-label" for="tier-name">Название уровня</label>
+    </div>
+
+
+    <div class="form-outline mb-4">
+      <input type="number" name="price" id="tier-price" class="form-control" oninput="this.value = Math.round(this.value);"/>
+      <label class="form-label" for="tier-price">Цена в месяц</label>
+    </div>
   
     <!-- Message input -->
-    <label>Запись</label>
     <div class="form-outline mb-4">
       
-      <textarea name="post_body" class="form-control" id="post_body_input" rows="4"></textarea>
-      <label class="form-label" for="form6Example7">Что нового?</label>
+      <textarea name="rewards" class="form-control" id="tier-rewards-input" rows="4"></textarea>
+      <label class="form-label" for="form6Example7">Награды за подписку</label>
     </div>
 
     <div id="image-preview">
@@ -112,7 +126,7 @@
 
   
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmitPost" disabled="disabled">Добавить запись</button>
+    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmitTier" disabled="disabled">Добавить уровень</button>
     <div class="alert alert-success" role="alert" id="submit-success" display="none">
       Запись успешно добавлена!
     </div>
@@ -133,7 +147,7 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/checklogin.js"></script>
     <script type="text/javascript" src="js/loadprofile.js"></script>
-    <script type="text/javascript" src="js/add_post.js"></script>
+    <script type="text/javascript" src="js/add_tier.js"></script>
     <script type="text/javascript" src="js/search_bar.js"></script>
   </body>
 </html>

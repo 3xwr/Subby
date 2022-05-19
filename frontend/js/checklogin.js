@@ -1,5 +1,5 @@
 endpoint="http:localhost:8080/testlive"
-if ($.cookie('access_token') == null) {
+if ($.cookie('access_token') === undefined) {
     $("#right-navbar")
     .append(
         $("<ul>")
@@ -26,7 +26,7 @@ if ($.cookie('access_token') == null) {
         {
         },
         error: function(jqXHR) {
-            if (jqXHR.status === 404 || jqXHR.status === 401) {
+            if (jqXHR.status === 404) {
             } else {
                 $.removeCookie('access_token', {path:'/'});
                 document.location.reload();
