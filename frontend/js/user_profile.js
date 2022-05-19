@@ -535,10 +535,29 @@ async function getMembershipDataByID(id) {
   }).catch();
 }
 
+async function getUserSubbedTiers(id) {
+  return new Promise((resolve, reject) => {
+    let userTiersPath = "http://localhost:8080/usertiers";
+    $.ajax({
+      type: "GET",
+      url: userTiersPath,
+      headers: {
+        Authorization: "Bearer " + $.cookie("access_token"),
+      },
+      success: function (data) {
+        resolve(data);
+      },
+      error: function () {
+        resolve(false);
+      },
+    });
+  }).catch();
+}
+
 function buildTierDivs(
   membership_data,
   userHasMembership,
-  current_user_membership_status
+  userTiers
 ) {
   $("#membership-info").append(
     $("<div>")
@@ -576,11 +595,33 @@ function buildTierDivs(
       $("#tier" + i).append(
         $("<p>").addClass("card-text").text(membership_data.tiers[i].rewards)
       );
-      if (!current_user_membership_status) {
+      if (userTiers!==undefined) {
+        console.log("USER TIERS - ",userTiers.length)
+
+        let userSubbed=false;
+        for (let index = 0; index < userTiers.length; index++) {
+          console.log("INDEX - ", index)
+          console.log(userTiers[index],membership_data.tiers[i].id,userTiers[index] == membership_data.tiers[i].id )
+          if (userTiers[index] == membership_data.tiers[i].id) {
+            userSubbed=true;
+          }
+        }
+        if(userSubbed) {
+          $("#tier" + i).append(
+            $("<p>").text("Подписка действует")
+          );
+        } else {
+          $("#tier" + i).append(
+            $("<a>").addClass("btn btn-primary").text("Подписаться")
+          );
+        }
+
+      } else {
         $("#tier" + i).append(
           $("<a>").addClass("btn btn-primary").text("Подписаться")
         );
       }
+
     }
   } else {
     $("#membership-tiers").append(
@@ -596,13 +637,22 @@ async function getUserTiers() {
   owner_id = await getUserIDByUsername(username);
   membership_id = await getMembershipIDByOwnerID(owner_id);
   console.log(membership_id);
+  if($.cookie("access_token")!==undefined) {
+    uuid = parseJwt($.cookie("access_token"))
+    subbedTiers = await getUserSubbedTiers(uuid.sub)
+    var tierArr = [];
+    for (let index = 0; index < subbedTiers.length; index++) {
+      tierArr.push(subbedTiers[index].tier_id)  
+    }
+    console.log(tierArr)
+  }
   if (membership_id === false) {
     console.log(membership_id);
     let data;
-    buildTierDivs(data, false, false);
+    buildTierDivs(data, false, tierArr);
   } else {
     membership_data = await getMembershipDataByID(membership_id);
-    buildTierDivs(membership_data, true, false);
+    buildTierDivs(membership_data, true, tierArr);
   }
 }
 
