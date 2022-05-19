@@ -228,30 +228,40 @@ async function getLoggedInUserID() {
     owner_id = await getLoggedInUserID();
     membership_id = await getMembershipIDByOwnerID(owner_id);
     if (membership_id === false) {
+        hasData = membership_id
+        buildTierDivs(hasData, hasData)
     } else {
       membership_data = await getMembershipDataByID(membership_id);
-      buildTierDivs(membership_data)
+      buildTierDivs(membership_data, true)
       console.log(membership_data);
     }
   }
   
   function buildTierDivs(
-    membership_data
+    membership_data,
+    hasData
   ) {
-      $('#tier-select').multiSelect({ keepOrder: true })
-      for (let i = 0; i < membership_data.tiers.length; i++) {
-          tier = membership_data.tiers[i]
-          $('#tier-select').multiSelect('addOption', {value:tier.id, text:tier.name})
+      if (!hasData) {
+          console.log(hasData)
+        $('#tier-select').hide()
+        $('.form-check-input').prop("disabled", true)
+      } else {
+        $('#tier-select').multiSelect({ keepOrder: true })
+        for (let i = 0; i < membership_data.tiers.length; i++) {
+            tier = membership_data.tiers[i]
+            $('#tier-select').multiSelect('addOption', {value:tier.id, text:tier.name})
+        }
+        $('#tier-select').next().hide();
+        $('.form-check-input').on('click', function() {
+            var checkbox = $(this);
+        
+            if (checkbox.is(':checked')) {
+              $('#tier-select').next().show(300);
+            } else {
+                $('#tier-select').next().hide(200);
+            }
+          });
+    
       }
-      $('#tier-select').next().hide();
-      $('.form-check-input').on('click', function() {
-          var checkbox = $(this);
-      
-          if (checkbox.is(':checked')) {
-            $('#tier-select').next().show(300);
-          } else {
-              $('#tier-select').next().hide(200);
-          }
-        });
-  
+     
   }

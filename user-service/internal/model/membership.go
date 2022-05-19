@@ -15,6 +15,11 @@ type MembershipTier struct {
 	ImageRef *string   `json:"image_ref,omitempty"`
 }
 
+type SubscribeToMembershipTierRequest struct {
+	UserID uuid.UUID `json:"user_id"`
+	TierID uuid.UUID `json:"tier_id"`
+}
+
 type CreateMembershipRequest struct {
 	Tiers []CreateTierRequest `json:"tiers"`
 }
@@ -28,6 +33,10 @@ type MembershipIdResponse struct {
 }
 
 type DeleteTierRequest struct {
+	TierID uuid.UUID `json:"tier_id"`
+}
+
+type UserSubscribedTier struct {
 	TierID uuid.UUID `json:"tier_id"`
 }
 

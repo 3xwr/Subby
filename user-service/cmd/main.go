@@ -77,6 +77,7 @@ func main() {
 
 		r.Method(http.MethodGet, handler.SubscriptionsPath, subscriptionsHandler)
 		r.Method(http.MethodGet, handler.PostsPath, postsHandler)
+		r.Method(http.MethodGet, handler.GetUserTiersPath, membershipHandler)
 
 		r.Method(http.MethodPost, handler.AuthPath, authHandler)
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
@@ -98,6 +99,7 @@ func main() {
 		r.Method(http.MethodPost, handler.CheckSubPath, subscriptionsHandler)
 		r.Method(http.MethodPost, handler.UserPostsPath, postsHandler)
 		r.Method(http.MethodPost, handler.MembershipIDByOwnerIDPath, membershipHandler)
+		r.Method(http.MethodPost, handler.SubscribeToMembershipTierPath, membershipHandler)
 	})
 
 	srv := http.Server{

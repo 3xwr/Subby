@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
@@ -24,6 +23,25 @@ func (db *Membership) GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, er
 		return membershipID, err
 	}
 	return membershipID, nil
+}
+
+func (db *Membership) GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier, error) {
+	rows, err := db.Query("SELECT tier_id FROM members WHERE user_id=$1", UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tiers []model.UserSubscribedTier
+
+	for rows.Next() {
+		var tier model.UserSubscribedTier
+		if err := rows.Scan(&tier.TierID); err != nil {
+			return nil, err
+		}
+		tiers = append(tiers, tier)
+	}
+	return tiers, nil
 }
 
 func (db *Membership) GetMembershipInfo(membershipID string) (model.Membership, error) {
@@ -102,7 +120,6 @@ func (db *Membership) DeleteMembership(ownerID uuid.UUID, membershipID uuid.UUID
 
 	_, err = tx.ExecContext(ctx, "DELETE FROM memberships WHERE id=$1 AND owner_id=$2", membershipID, ownerID)
 	if err != nil {
-		fmt.Println("memberships insert error")
 		tx.Rollback()
 		return err
 	}
@@ -121,6 +138,26 @@ func (db *Membership) AddTier(tier model.MembershipTier, ownerID uuid.UUID) erro
 		return err
 	}
 	_, err = db.Exec("INSERT INTO tiers (id, name, price, rewards, image_ref, membership_id) VALUES ($1, $2, $3, $4, $5, $6)", tier.ID, tier.Name, tier.Price, tier.Rewards, tier.ImageRef, membershipID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *Membership) SubscribeToMembershipTier(userID uuid.UUID, tierID uuid.UUID) error {
+	var u user
+	err := db.QueryRow("SELECT id FROM users WHERE id = $1", userID).Scan(&u.id)
+	if err != nil {
+		return err
+	}
+
+	var t model.MembershipTier
+	err = db.QueryRow("SELECT id FROM tiers WHERE id = $1", tierID).Scan(&t.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("INSERT INTO members (user_id, tier_id) VALUES ($1,$2)", userID, tierID)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"sort"
 	"user-service/internal/model"
 
@@ -232,7 +231,6 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 				for _, tier := range tiers {
 					t1 := postTier.String()
 					t2 := tier.ID.String()
-					fmt.Println("post tier ", t1, " tier.id", t2)
 					if (t1 == t2) || (userUUID == post.PosterID) {
 						locked = false
 						break

@@ -15,7 +15,9 @@ type Membership struct {
 
 type MembershipRepo interface {
 	GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error)
+	GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier, error)
 	GetMembershipInfo(string) (model.Membership, error)
+	SubscribeToMembershipTier(uuid.UUID, uuid.UUID) error
 	CreateMembership(model.Membership) error
 	DeleteMembership(uuid.UUID, uuid.UUID) error
 	AddTier(model.MembershipTier, uuid.UUID) error
@@ -27,6 +29,14 @@ func NewMembership(logger *zerolog.Logger, repo MembershipRepo) *Membership {
 		logger: logger,
 		repo:   repo,
 	}
+}
+
+func (s *Membership) GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier, error) {
+	tiers, err := s.repo.GetUserTiers(UserID)
+	if err != nil {
+		return nil, err
+	}
+	return tiers, nil
 }
 
 func (s *Membership) GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error) {
@@ -97,6 +107,14 @@ func (s *Membership) DeleteMembership(token string, membershipID uuid.UUID) erro
 		return err
 	}
 
+	return nil
+}
+
+func (s *Membership) SubscribeToMembershipTier(userID uuid.UUID, tierID uuid.UUID) error {
+	err := s.repo.SubscribeToMembershipTier(userID, tierID)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

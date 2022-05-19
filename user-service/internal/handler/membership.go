@@ -6,16 +6,19 @@ import (
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
+	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/rs/zerolog"
 )
 
 const (
-	MembershipIDByOwnerIDPath = "/membershipowner"
-	MembershipPath            = "/membership"
-	CreateMembershipPath      = "/createmembership"
-	DeleteMembershipPath      = "/deletemembership"
-	AddTierPath               = "/addtier"
-	DeleteTierPath            = "/deletetier"
+	MembershipIDByOwnerIDPath     = "/membershipowner"
+	MembershipPath                = "/membership"
+	SubscribeToMembershipTierPath = "/tiersubscribe"
+	GetUserTiersPath              = "/usertiers"
+	CreateMembershipPath          = "/createmembership"
+	DeleteMembershipPath          = "/deletemembership"
+	AddTierPath                   = "/addtier"
+	DeleteTierPath                = "/deletetier"
 )
 
 type Membership struct {
@@ -32,7 +35,9 @@ func NewMembership(logger *zerolog.Logger, srv MembershipService) *Membership {
 
 type MembershipService interface {
 	GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, error)
+	GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier, error)
 	GetMembershipInfo(string) (model.Membership, error)
+	SubscribeToMembershipTier(uuid.UUID, uuid.UUID) error
 	CreateMembership(model.CreateMembershipRequest, string) error
 	DeleteMembership(string, uuid.UUID) error
 	AddTier(model.CreateTierRequest, string) error
@@ -56,6 +61,21 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			writeResponse(w, http.StatusOK, model.MembershipIdResponse{MembershipID: membershipID})
+		}
+		if r.URL.String() == SubscribeToMembershipTierPath {
+			var subRequest model.SubscribeToMembershipTierRequest
+			err := json.NewDecoder(r.Body).Decode(&subRequest)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
+				return
+			}
+			err = h.service.SubscribeToMembershipTier(subRequest.UserID, subRequest.TierID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Subscribe error"})
+				return
+			}
 		}
 		if r.URL.String() == AddTierPath {
 			userIDToken, err := getUserID(r)
@@ -158,5 +178,34 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+	}
+	if r.Method == http.MethodGet {
+		if r.URL.String() == GetUserTiersPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
+			jwt, err := jwt.ParseString(userIDToken)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
+			userUUID, err := uuid.Parse(jwt.Subject())
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "UUID parse error"})
+				return
+			}
+			tiers, err := h.service.GetUserTiers(userUUID)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Get user tiers error"})
+				return
+			}
+			writeResponse(w, http.StatusOK, tiers)
+		}
 	}
 }
