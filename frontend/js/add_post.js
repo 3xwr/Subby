@@ -88,16 +88,24 @@ $(function () {
         jsonData = JSON.parse(reduced)
 
         let membership_locked = false
-        let membership_tier 
+        let values
 
         if($('#paid-post-check').is(":checked")) {
             const selected = document.querySelectorAll('#tier-select option:checked');
-            const values = Array.from(selected).map(el => el.value);
+            values = Array.from(selected).map(el => el.value);
+            membership_locked = true
+            membership_tier = values
+            values = JSON.stringify(values)
             console.log(values)
         }
 
         if (img_address==='') {
-            let textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":false}'
+            var textJSON
+            if (membership_locked) {
+                textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":'+membership_locked+',"membership_tiers":'+values+'}'
+            } else {
+                textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":'+membership_locked+'}'
+            }
             $.ajax({
                 type: "POST",
                 url: post_submit_url,
@@ -119,7 +127,12 @@ $(function () {
                 }
             });
         } else {
-            let textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":false,"image_ref":"'+img_address+'"}'
+            var textJSON
+            if (membership_locked) {
+                textJSON  = '{"body":"'+jsonData.post_body+'","membership_locked":'+membership_locked+',"membership_tiers":'+values+',"image_ref":"'+img_address+'"}'
+            } else {
+                textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":false,"image_ref":"'+img_address+'"}'
+            }
             $.ajax({
                 type: "POST",
                 url: post_submit_url,

@@ -103,7 +103,7 @@ func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest)
 		PosterID:         posterID,
 		Body:             postData.Body,
 		MembershipLocked: postData.MembershipLocked,
-		MembershipTier:   postData.MembershipTier,
+		MembershipTiers:  postData.MembershipTiers,
 		ImageRef:         postData.ImageRef,
 	}
 	err = s.repo.SaveNewPost(post)

@@ -109,7 +109,7 @@ $.ajax({
                             )
                         )
                     }
-                   if (data[i].Membership_locked) {
+                   if (data[i].membership_locked) {
                        lockPath = "http://localhost:9080/img/post-lock-icon.png"
                         $("#"+post_id)
                         .append(
