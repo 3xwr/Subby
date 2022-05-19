@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
@@ -26,7 +27,7 @@ func (db *Membership) GetMembershipIDByOwnerID(OwnerID uuid.UUID) (uuid.UUID, er
 }
 
 func (db *Membership) GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier, error) {
-	rows, err := db.Query("SELECT tier_id FROM members WHERE user_id=$1", UserID)
+	rows, err := db.Query("SELECT tier_id, member_until FROM members WHERE user_id=$1", UserID)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func (db *Membership) GetUserTiers(UserID uuid.UUID) ([]model.UserSubscribedTier
 
 	for rows.Next() {
 		var tier model.UserSubscribedTier
-		if err := rows.Scan(&tier.TierID); err != nil {
+		if err := rows.Scan(&tier.TierID, &tier.MemberUntil); err != nil {
 			return nil, err
 		}
 		tiers = append(tiers, tier)
@@ -157,7 +158,9 @@ func (db *Membership) SubscribeToMembershipTier(userID uuid.UUID, tierID uuid.UU
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO members (user_id, tier_id) VALUES ($1,$2)", userID, tierID)
+	validUntil := time.Now().AddDate(0, 1, 0)
+
+	_, err = db.Exec("INSERT INTO members (user_id, tier_id, member_until) VALUES ($1,$2,$3)", userID, tierID, validUntil)
 	if err != nil {
 		return err
 	}

@@ -82,3 +82,7 @@
     width:20px;
     height: 20px;
 }
+
+#subbed-label {
+  margin-bottom: 0;
+}

@@ -1,6 +1,10 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Membership struct {
 	OwnerID uuid.UUID        `json:"owner_id"`
@@ -37,7 +41,8 @@ type DeleteTierRequest struct {
 }
 
 type UserSubscribedTier struct {
-	TierID uuid.UUID `json:"tier_id"`
+	TierID      uuid.UUID `json:"tier_id"`
+	MemberUntil time.Time `json:"member_until"`
 }
 
 type CreateTierRequest struct {
