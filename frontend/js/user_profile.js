@@ -166,12 +166,10 @@ $.ajax({
                 data: userPostsRequest,
                 success: function (data) {
                   console.log(data);
-                  if (data==null) {
-                    $("#posts")
-                    .append(
-                      $("<p>")
-                      .text("У пользователя еще нет записей")
-                    )
+                  if (data == null) {
+                    $("#posts").append(
+                      $("<p>").text("У пользователя еще нет записей")
+                    );
                   } else {
                     for (let i = 0; i < data.length; i++) {
                       let post_id = "post_" + i;
@@ -198,7 +196,8 @@ $.ajax({
                                     .attr("id", "poster-data")
                                     .attr(
                                       "href",
-                                      profile_base_path + data[i].poster_username
+                                      profile_base_path +
+                                        data[i].poster_username
                                     )
                                     .append(
                                       $("<img>")
@@ -245,7 +244,8 @@ $.ajax({
                                     .attr("id", "poster-data")
                                     .attr(
                                       "href",
-                                      profile_base_path + data[i].poster_username
+                                      profile_base_path +
+                                        data[i].poster_username
                                     )
                                     .append(
                                       $("<img>")
@@ -265,7 +265,7 @@ $.ajax({
                                     )
                                     .attr("id", post_id)
                                 )
-  
+
                                 .append(
                                   $("<h6>")
                                     .text(formattedDate)
@@ -287,7 +287,8 @@ $.ajax({
                         );
                       }
                       if (data[i].membership_locked) {
-                        lockPath = "http://localhost:9080/img/post-lock-icon.png";
+                        lockPath =
+                          "http://localhost:9080/img/post-lock-icon.png";
                         $("#" + post_id).append(
                           $("<img>")
                             .attr("src", lockPath)
@@ -315,12 +316,10 @@ $.ajax({
                 },
                 success: function (data) {
                   console.log(data);
-                  if (data==null) {
-                    $("#posts")
-                    .append(
-                      $("<p>")
-                      .text("У пользователя еще нет записей")
-                    )
+                  if (data == null) {
+                    $("#posts").append(
+                      $("<p>").text("У пользователя еще нет записей")
+                    );
                   } else {
                     for (let i = 0; i < data.length; i++) {
                       let post_id = "post_" + i;
@@ -347,7 +346,8 @@ $.ajax({
                                     .attr("id", "poster-data")
                                     .attr(
                                       "href",
-                                      profile_base_path + data[i].poster_username
+                                      profile_base_path +
+                                        data[i].poster_username
                                     )
                                     .append(
                                       $("<img>")
@@ -394,7 +394,8 @@ $.ajax({
                                     .attr("id", "poster-data")
                                     .attr(
                                       "href",
-                                      profile_base_path + data[i].poster_username
+                                      profile_base_path +
+                                        data[i].poster_username
                                     )
                                     .append(
                                       $("<img>")
@@ -414,7 +415,7 @@ $.ajax({
                                     )
                                     .attr("id", post_id)
                                 )
-  
+
                                 .append(
                                   $("<h6>")
                                     .text(formattedDate)
@@ -436,7 +437,8 @@ $.ajax({
                         );
                       }
                       if (data[i].membership_locked) {
-                        lockPath = "http://localhost:9080/img/post-lock-icon.png";
+                        lockPath =
+                          "http://localhost:9080/img/post-lock-icon.png";
                         $("#" + post_id).append(
                           $("<img>")
                             .attr("src", lockPath)
@@ -583,8 +585,8 @@ function buildTierDivs(
       .text("Уровни платной подписки")
   );
   if (userHasMembership) {
+    console.log(membership_data.tiers.length);
     for (let i = 0; i < membership_data.tiers.length; i++) {
-      console.log(membership_data);
       $("#membership-tiers").append(
         $("<li>")
           .addClass("list-group-item px-3 tier")
@@ -612,70 +614,72 @@ function buildTierDivs(
       $("#tier" + i).append(
         $("<p>").addClass("card-text").text(membership_data.tiers[i].rewards)
       );
-      if(membership_data.owner_id===loggedInUserID) {
+      if (membership_data.owner_id === loggedInUserID) {
         $("#tier" + i)
-        .append(
-          $("<p>")
-          .attr("id","subbed-label")
-          .text("Вы подписаны")
-        )
-        .append(
-          $("<h6>")
-            .attr("id", "tier-name")
-            .addClass("text-muted")
-            .text("Навсегда")
-        )
-        break
+          .append($("<p>").attr("id", "subbed-label").text("Вы подписаны"))
+          .append(
+            $("<h6>")
+              .attr("id", "tier-name")
+              .addClass("text-muted")
+              .text("Навсегда")
+          );
+        continue;
       }
-      console.log(userTiers)
-      if (userTiers!==undefined) {
-        console.log("USER TIERS - ",userTiers.length)
+      console.log(userTiers);
+      if (userTiers !== undefined) {
+        console.log("USER TIERS - ", userTiers.length);
 
-        let userSubbed=false;
-        let currentTier
+        let userSubbed = false;
+        let currentTier;
         for (let index = 0; index < userTiers.length; index++) {
-          console.log("INDEX - ", index)
-          console.log(userTiers[index].tier_id,membership_data.tiers[i].id,userTiers[index] == membership_data.tiers[i].id )
+          console.log("INDEX - ", index);
+          console.log(
+            userTiers[index].tier_id,
+            membership_data.tiers[i].id,
+            userTiers[index] == membership_data.tiers[i].id
+          );
           if (userTiers[index].tier_id == membership_data.tiers[i].id) {
-            userSubbed=true;
-            currentTier = userTiers[index]
+            userSubbed = true;
+            currentTier = userTiers[index];
           }
         }
-        if(userSubbed) {
-          date = new Date(currentTier.member_until)
+        if (userSubbed) {
+          date = new Date(currentTier.member_until);
           const formattedDate = date.toLocaleString("ru", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            });
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
 
- 
-            $("#tier" + i)
-            .append(
-              $("<p>")
-              .text("Вы подписаны")
-              .attr("id","subbed-label")
-            )
+          $("#tier" + i)
+            .append($("<p>").text("Вы подписаны").attr("id", "subbed-label"))
             .append(
               $("<h6>")
                 .attr("id", "tier-name")
                 .addClass("text-muted")
-                .text("До "+formattedDate)
-            )
-
-          
+                .text("До " + formattedDate)
+            );
         } else {
           $("#tier" + i).append(
-            $("<a>").addClass("btn btn-primary").text("Подписаться")
+            $("<a>")
+            .addClass("btn btn-primary")
+            .text("Подписаться")
+            .attr("id","tier-btn"+i)
           );
+          btn_id = "#tier-btn"+i
+          tier_id = membership_data.tiers[i].id
+          console.log(btn_id,tier_id)
+          tierSubButtonListener(btn_id,tier_id)
         }
-
       } else {
         $("#tier" + i).append(
           $("<a>").addClass("btn btn-primary").text("Подписаться")
         );
+        btn_id = "#tier-btn"+i
+        tier_id = membership_data.tiers[i].id
+        console.log(btn_id,tier_id)
+        tierSubButtonListener(btn_id,tier_id)
       }
-
     }
   } else {
     $("#membership-tiers").append(
@@ -691,22 +695,59 @@ async function getUserTiers() {
   loggedInUserID = await getLoggedInUserID();
   owner_id = await getUserIDByUsername(username);
   membership_id = await getMembershipIDByOwnerID(owner_id);
-  console.log(membership_id);
-  if($.cookie("access_token")!==undefined) {
-    uuid = parseJwt($.cookie("access_token"))
-    subbedTiers = await getUserSubbedTiers(uuid.sub)
-  }
-  if (membership_id === false) {
-    console.log(membership_id);
-    let data;
-    buildTierDivs(data, false, subbedTiers,loggedInUserID);
+  if ($.cookie("access_token") !== undefined) {
+    uuid = parseJwt($.cookie("access_token"));
+    subbedTiers = await getUserSubbedTiers(uuid.sub);
+    if (membership_id === false) {
+      let data;
+      buildTierDivs(data, false, subbedTiers, loggedInUserID);
+    } else {
+      membership_data = await getMembershipDataByID(membership_id);
+      buildTierDivs(membership_data, true, subbedTiers, loggedInUserID);
+    }
   } else {
-    membership_data = await getMembershipDataByID(membership_id);
-    buildTierDivs(membership_data, true, subbedTiers,loggedInUserID);
+    if (membership_id === false) {
+      let data;
+      buildTierDivs(data, false, false, loggedInUserID);
+    } else {
+      membership_data = await getMembershipDataByID(membership_id);
+      buildTierDivs(membership_data, true, false, loggedInUserID);
+    }
   }
+
 }
 
 getUserTiers();
+
+function tierSubButtonListener(btnID, tierID) {
+
+  subscribePath = "http://localhost:8080/tiersubscribe";
+  console.log("listening to " + btnID)
+  $(btnID).on("click", function () {
+
+    userUUID = parseJwt($.cookie("access_token"));
+    subTierJSON =
+      '{"user_id":"' + userUUID.sub + '","tier_id":"' + tierID + '"}';
+      console.log(subTierJSON)
+    $.ajax({
+      type: "POST",
+      url: subscribePath,
+      data: subTierJSON,
+      headers: {
+        Authorization: "Bearer " + $.cookie("access_token"),
+      },
+      success: function (data) {
+        alert("ALL SUBS ARE FREE NOW FOR TESTING PURPOSES");
+        document.location.reload();
+      },
+      error: function (jqXHR) {
+        if (jqXHR.status === 403 || jqXHR.status === 401) {
+          window.location.replace("http://localhost:9080/login.html");
+        }
+      },
+    });
+  });
+}
 
 function subscribeButtonClickListener() {
   $("#sub_button").off();
