@@ -8,8 +8,8 @@ import (
 
 type PostSubmitRequest struct {
 	Body             *string    `json:"body"`
-	MembershipLocked bool       `json:"Membership_locked"`
-	MembershipTier   *uuid.UUID `json:"Membership_tier,omitempty"`
+	MembershipLocked bool       `json:"membership_locked"`
+	MembershipTier   *uuid.UUID `json:"membership_tier,omitempty"`
 	ImageRef         *string    `json:"image_ref,omitempty"`
 }
 
@@ -28,7 +28,7 @@ type Post struct {
 	PosterUsername   string     `json:"poster_username"`
 	PosterAvatarRef  string     `json:"poster_avatar"`
 	Body             *string    `json:"body"`
-	MembershipLocked bool       `json:"Membership_locked"`
-	MembershipTier   *uuid.UUID `json:"Membership_tier,omitempty"`
+	MembershipLocked bool       `json:"membership_locked"`
+	MembershipTier   *uuid.UUID `json:"membership_tier,omitempty"`
 	ImageRef         *string    `json:"image_ref,omitempty"`
 }

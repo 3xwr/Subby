@@ -18,6 +18,8 @@ base_path = "http://localhost:9080/img/"
 
 let empty = false;
 
+getUserTiers();
+
 $("input[name='img']").change(function() {
 
     var form = $('#upload-form')[0];
@@ -85,6 +87,15 @@ $(function () {
         reduced = JSON.stringify(reduced)
         jsonData = JSON.parse(reduced)
 
+        let membership_locked = false
+        let membership_tier 
+
+        if($('#paid-post-check').is(":checked")) {
+            const selected = document.querySelectorAll('#tier-select option:checked');
+            const values = Array.from(selected).map(el => el.value);
+            console.log(values)
+        }
+
         if (img_address==='') {
             let textJSON = '{"body":"'+jsonData.post_body+'","membership_locked":false}'
             $.ajax({
@@ -133,3 +144,101 @@ $(function () {
     });
 });
 
+
+async function getLoggedInUserID() {
+    return new Promise((resolve) => {
+      let checkPath = "http://localhost:8080/livecheck";
+      if ($.cookie("access_token") === undefined) {
+        resolve(false);
+      } else {
+        $.ajax({
+          type: "GET",
+          url: checkPath,
+          headers: {
+            Authorization: "Bearer " + $.cookie("access_token"),
+          },
+          success: function (data) {
+            //resolve(data)
+          },
+          error: function (jqXHR) {
+            if (jqXHR.status === 404) {
+              logged_in_id = parseJwt($.cookie("access_token")).sub;
+              resolve(logged_in_id);
+            } else {
+              $.removeCookie("access_token", { path: "/" });
+              document.location.reload();
+            }
+          },
+        });
+      }
+    });
+  }
+  
+  //get user membership tiers
+  async function getMembershipIDByOwnerID(id) {
+    return new Promise((resolve, reject) => {
+      let membershipOwnerPath = "http://localhost:8080/membershipowner";
+      let ownerIDJSON = '{"owner_id":"' + id + '"}';
+      $.ajax({
+        type: "POST",
+        url: membershipOwnerPath,
+        data: ownerIDJSON,
+        success: function (data) {
+          resolve(data.membership_id);
+        },
+        error: function () {
+          resolve(false);
+        },
+      });
+    });
+  }
+  
+  async function getMembershipDataByID(id) {
+    return new Promise((resolve, reject) => {
+      let membershipPath = "http://localhost:8080/membership";
+      let membershipIDJSON = '{"membership_id":"' + id + '"}';
+      $.ajax({
+        type: "POST",
+        url: membershipPath,
+        data: membershipIDJSON,
+        success: function (data) {
+          resolve(data);
+        },
+        error: function () {
+          resolve(false);
+        },
+      });
+    }).catch();
+  }
+  
+  async function getUserTiers() {
+    owner_id = await getLoggedInUserID();
+    membership_id = await getMembershipIDByOwnerID(owner_id);
+    if (membership_id === false) {
+    } else {
+      membership_data = await getMembershipDataByID(membership_id);
+      buildTierDivs(membership_data)
+      console.log(membership_data);
+    }
+  }
+  
+  function buildTierDivs(
+    membership_data
+  ) {
+      $('#tier-select').multiSelect({ keepOrder: true })
+      for (let i = 0; i < membership_data.tiers.length; i++) {
+          tier = membership_data.tiers[i]
+          $('#tier-select').multiSelect('addOption', {value:tier.id, text:tier.name})
+      }
+      $('#tier-select').next().hide();
+      $('.form-check-input').on('click', function() {
+          var checkbox = $(this);
+      
+          if (checkbox.is(':checked')) {
+            $('#tier-select').next().show(300);
+          } else {
+              $('#tier-select').next().hide(200);
+          }
+        });
+  
+  }
