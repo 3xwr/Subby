@@ -93,27 +93,27 @@
     <!-- Container wrapper -->
   </nav>
   <!-- Navbar -->
-  <div class="form" name="add-tier-form" autocomplete="off">
+<div class="form" name="add-item-form" autocomplete="off">
 <input type="text" style="display:none">
 <input type="password" style="display:none">
   <form id="upload-form">
 
     <div class="form-outline mb-4">
-      <input type="text" name="name" id="tier-name" class="form-control" />
-      <label class="form-label" for="tier-name">Название уровня</label>
+      <input type="text" name="name" id="item-name" class="form-control" />
+      <label class="form-label" for="item-name">Название товара</label>
     </div>
 
 
     <div class="form-outline mb-4">
-      <input type="number" name="price" id="tier-price" class="form-control" oninput="this.value = Math.round(this.value);"/>
-      <label class="form-label" for="tier-price">Цена в месяц</label>
+      <input type="number" name="price" id="item-price" class="form-control" oninput="this.value = Math.round(this.value);"/>
+      <label class="form-label" for="item-price">Цена товара</label>
     </div>
   
     <!-- Message input -->
     <div class="form-outline mb-4">
       
-      <textarea name="rewards" class="form-control" id="tier-rewards-input" rows="4"></textarea>
-      <label class="form-label" for="form6Example7">Награды за подписку</label>
+      <textarea name="description" class="form-control" id="item-description-input" rows="4"></textarea>
+      <label class="form-label" for="item-description-input">Описание товара</label>
     </div>
 
     <div id="image-preview">
@@ -122,19 +122,19 @@
     </div>
 
     <div id="img-submit">
-      <label class="form-label" for="customFile">Добавить изображение</label>
+      <label class="form-label" for="customFile">Добавить изображение товара</label>
       <input type="file" class="form-control" name="img"  />
     </div>
 
 
   
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmitTier" disabled="disabled">Добавить уровень</button>
+    <button type="submit" class="btn btn-primary btn-block mb-4" id="btnSubmitItem" disabled="disabled">Добавить уровень</button>
     <div class="alert alert-success" role="alert" id="submit-success" display="none">
-      Уровень подписки успешно добавлен!
+      Товар успешно добавлен!
     </div>
     <div class="alert alert-danger" role="alert" id="submit-error" display="none">
-      Ошибка при добавлении уровня подписки!
+      Ошибка при добавлении товара!
     </div>
   </form>
   
@@ -150,7 +150,7 @@
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/checklogin.js"></script>
     <script type="text/javascript" src="js/loadprofile.js"></script>
-    <script type="text/javascript" src="js/add_tier.js"></script>
+    <script type="text/javascript" src="js/add_shopitem.js"></script>
     <script type="text/javascript" src="js/search_bar.js"></script>
   </body>
 </html>

@@ -7,14 +7,14 @@ type ShopItem struct {
 	OwnerID     uuid.UUID `json:"owner_id"`
 	Name        string    `json:"name"`
 	Price       int64     `json:"price"`
-	Description string    `json:"rewards"`
+	Description string    `json:"description"`
 	ImageRef    string    `json:"image_ref"`
 }
 
 type AddItemRequest struct {
 	Name        string `json:"name"`
 	Price       int64  `json:"price"`
-	Description string `json:"rewards"`
+	Description string `json:"description"`
 	ImageRef    string `json:"image_ref"`
 }
 
