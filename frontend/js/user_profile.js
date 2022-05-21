@@ -87,387 +87,432 @@ function changeSubButton() {
   }
 }
 
+async function getLoggedInUserID() {
+  return new Promise((resolve) => {
+    let checkPath = "http://localhost:8080/livecheck";
+    if ($.cookie("access_token") === undefined) {
+      resolve(false);
+    } else {
+      $.ajax({
+        type: "GET",
+        url: checkPath,
+        headers: {
+          Authorization: "Bearer " + $.cookie("access_token"),
+        },
+        success: function (data) {
+          //resolve(data)
+        },
+        error: function (jqXHR) {
+          if (jqXHR.status === 404) {
+            logged_in_id = parseJwt($.cookie("access_token")).sub;
+            resolve(logged_in_id);
+          } else {
+            $.removeCookie("access_token", { path: "/" });
+            document.location.reload();
+          }
+        },
+      });
+    }
+  });
+}
+
+async function getPosts() {
+  currentUserID = await getLoggedInUserID();
+  $.ajax({
+    type: "POST",
+    url: userIDByNamePath,
+    data: userIDRequestJSON,
+    headers: {
+      "Content-type": "application/json",
+    },
+    success: function (data) {
+      let userProfileRequestBody =
+        '{"user_id":"' + data.user_id + '","full_info":true}';
+      userPageID = data.user_id;
+  
+      $.ajax({
+        type: "POST",
+        url: user_data_endpoint, //here is an error
+        data: userProfileRequestBody,
+        headers: {
+          "Content-type": "application/json",
+        },
+        success: function (data) {
+          base_path = "http://localhost:9080/img/";
+          if (token === undefined || parseJwt(token).sub === userPageID) {
+            $("#userInfo").append(
+              $("<div>")
+                .addClass("p-5 text-center bg-light")
+                .append(
+                  $("<img>")
+                    .attr("src", base_path + data.avatar_ref)
+                    .addClass("rounded-circle")
+                    .attr("height", "200")
+                    .attr("width", "200")
+                    .attr("loading", "lazy")
+                )
+                .append($("<h1>").addClass("mb-3").text(data.name))
+                .append(
+                  $("<h4>")
+                    .addClass("mb-3")
+                    .text("Подписчики: " + data.subscriber_count)
+                    .attr("id", "sub_counter")
+                )
+            );
+          } else {
+            $("#userInfo").append(
+              $("<div>")
+                .addClass("p-5 text-center bg-light")
+                .append(
+                  $("<img>")
+                    .attr("src", base_path + data.avatar_ref)
+                    .addClass("rounded-circle")
+                    .attr("height", "200")
+                    .attr("width", "200")
+                    .attr("loading", "lazy")
+                )
+                .append($("<h1>").addClass("mb-3").text(data.name))
+                .append(
+                  $("<h4>")
+                    .addClass("mb-3")
+                    .text("Подписчики: " + data.subscriber_count)
+                    .attr("id", "sub_counter")
+                )
+                .append(
+                  $("<a>").addClass("btn btn-primary").attr("id", "sub_button")
+                )
+            );
+            changeSubButton();
+            subscribeButtonClickListener();
+          }
+          var userPostsEndpoint = "http://localhost:8080/userposts";
+          let userPostsRequest = '{"poster_id":"' + userPageID + '"}';
+          getLoggedInUserID().then(
+            function (value) {
+              if (value === false) {
+                $.ajax({
+                  type: "POST",
+                  url: userPostsEndpoint,
+                  data: userPostsRequest,
+                  success: function (data) {
+                    if (data == null) {
+                      $("#posts").append(
+                        $("<h5>").text("У пользователя еще нет записей").attr("id","no-posts")
+                      );
+                    } else {
+                      for (let i = 0; i < data.length; i++) {
+                        let post_id = "post_" + i;
+                        let img_src = data[i].image_ref;
+                        posted_at = data[i].posted_at;
+                        date = new Date(posted_at);
+                        const formattedDate = date.toLocaleString("ru", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        });
+                        if (img_src === undefined) {
+                          $("#posts").append(
+                            $("<div>")
+                              .addClass("card")
+                              .append(
+                                $("<div>")
+                                  .addClass("card-body")
+                                  .append(
+                                    $("<a>")
+                                      .addClass("d-flex justify-content-start")
+                                      .attr("id", "poster-data")
+                                      .attr(
+                                        "href",
+                                        profile_base_path +
+                                          data[i].poster_username
+                                      )
+                                      .append(
+                                        $("<img>")
+                                          .attr(
+                                            "src",
+                                            base_path + data[i].poster_avatar
+                                          )
+                                          .addClass("rounded-circle")
+                                          .attr("height", "30")
+                                          .attr("width", "30")
+                                          .attr("loading", "lazy")
+                                      )
+                                      .append(
+                                        $("<h5>")
+                                          .text(data[i].poster_username)
+                                          .attr("id", "post-name")
+                                      )
+                                      .attr("id", post_id)
+                                  )
+                                  .append(
+                                    $("<h6>")
+                                      .text(formattedDate)
+                                      .addClass(
+                                        "card-subtitle mb-2 text-muted d-flex justify-content-start"
+                                      )
+                                  )
+                                  .append(
+                                    $("<p>")
+                                      .addClass("card-text")
+                                      .text(data[i].body)
+                                  )
+                              )
+                          );
+                        } else {
+                          $("#posts").append(
+                            $("<div>")
+                              .addClass("card")
+                              .append(
+                                $("<div>")
+                                  .addClass("card-body")
+                                  .append(
+                                    $("<a>")
+                                      .addClass("d-flex justify-content-start")
+                                      .attr("id", "poster-data")
+                                      .attr(
+                                        "href",
+                                        profile_base_path +
+                                          data[i].poster_username
+                                      )
+                                      .append(
+                                        $("<img>")
+                                          .attr(
+                                            "src",
+                                            base_path + data[i].poster_avatar
+                                          )
+                                          .addClass("rounded-circle")
+                                          .attr("height", "30")
+                                          .attr("width", "30")
+                                          .attr("loading", "lazy")
+                                      )
+                                      .append(
+                                        $("<h5>")
+                                          .text(data[i].poster_username)
+                                          .attr("id", "post-name")
+                                      )
+                                      .attr("id", post_id)
+                                  )
+  
+                                  .append(
+                                    $("<h6>")
+                                      .text(formattedDate)
+                                      .addClass(
+                                        "card-subtitle mb-2 text-muted d-flex justify-content-start"
+                                      )
+                                  )
+                                  .append(
+                                    $("<p>")
+                                      .addClass("card-text")
+                                      .text(data[i].body)
+                                  )
+                              )
+                              .append(
+                                $("<img>")
+                                  .attr("src", base_path + img_src)
+                                  .addClass("card-img-top")
+                              )
+                          );
+                        }
+                        if (data[i].membership_locked) {
+                          lockPath =
+                            "http://localhost:9080/img/post-lock-icon.png";
+                          $("#" + post_id).append(
+                            $("<img>")
+                              .attr("src", lockPath)
+                              .attr("id", "locked-post")
+                          );
+                        }
+                      }
+                    }
+                  },
+                  error: function (jqXHR) {
+                    // console.log(jqXHR);
+                    if (jqXHR.status === 403 || jqXHR.status === 401) {
+                      alert("403 or 401");
+                      window.location.replace("http://localhost:9080/login.html");
+                    }
+                  },
+                });
+              } else {
+                $.ajax({
+                  type: "POST",
+                  url: userPostsEndpoint,
+                  data: userPostsRequest,
+                  headers: {
+                    Authorization: "Bearer " + $.cookie("access_token"),
+                  },
+                  success: function (data) {
+                    // console.log(data);
+                    if (data == null) {
+                      $("#posts").append(
+                        $("<h5>").text("У пользователя еще нет записей").attr("id","no-posts")
+                      );
+                    } else {
+                      for (let i = 0; i < data.length; i++) {
+                        let post_id = "post_" + i;
+                        let img_src = data[i].image_ref;
+                        posted_at = data[i].posted_at;
+                        date = new Date(posted_at);
+                        const formattedDate = date.toLocaleString("ru", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        });
+                        if (img_src === undefined) {
+                          $("#posts").append(
+                            $("<div>")
+                              .addClass("card")
+                              .append(
+                                $("<div>")
+                                  .addClass("card-body")
+                                  .append(
+                                    $("<a>")
+                                      .addClass("d-flex justify-content-start")
+                                      .attr("id", "poster-data")
+                                      .attr(
+                                        "href",
+                                        profile_base_path +
+                                          data[i].poster_username
+                                      )
+                                      .append(
+                                        $("<img>")
+                                          .attr(
+                                            "src",
+                                            base_path + data[i].poster_avatar
+                                          )
+                                          .addClass("rounded-circle")
+                                          .attr("height", "30")
+                                          .attr("width", "30")
+                                          .attr("loading", "lazy")
+                                      )
+                                      .append(
+                                        $("<h5>")
+                                          .text(data[i].poster_username)
+                                          .attr("id", "post-name")
+                                      )
+                                      .attr("id", post_id)
+                                  )
+                                  .append(
+                                    $("<h6>")
+                                      .text(formattedDate)
+                                      .addClass(
+                                        "card-subtitle mb-2 text-muted d-flex justify-content-start"
+                                      )
+                                  )
+                                  .append(
+                                    $("<p>")
+                                      .addClass("card-text")
+                                      .text(data[i].body)
+                                  )
+                              )
+                          );
+                        } else {
+                          $("#posts").append(
+                            $("<div>")
+                              .addClass("card")
+                              .append(
+                                $("<div>")
+                                  .addClass("card-body")
+                                  .append(
+                                    $("<a>")
+                                      .addClass("d-flex justify-content-start")
+                                      .attr("id", "poster-data")
+                                      .attr(
+                                        "href",
+                                        profile_base_path +
+                                          data[i].poster_username
+                                      )
+                                      .append(
+                                        $("<img>")
+                                          .attr(
+                                            "src",
+                                            base_path + data[i].poster_avatar
+                                          )
+                                          .addClass("rounded-circle")
+                                          .attr("height", "30")
+                                          .attr("width", "30")
+                                          .attr("loading", "lazy")
+                                      )
+                                      .append(
+                                        $("<h5>")
+                                          .text(data[i].poster_username)
+                                          .attr("id", "post-name")
+                                      )
+                                      .attr("id", post_id)
+                                  )
+  
+                                  .append(
+                                    $("<h6>")
+                                      .text(formattedDate)
+                                      .addClass(
+                                        "card-subtitle mb-2 text-muted d-flex justify-content-start"
+                                      )
+                                  )
+                                  .append(
+                                    $("<p>")
+                                      .addClass("card-text")
+                                      .text(data[i].body)
+                                  )
+                              )
+                              .append(
+                                $("<img>")
+                                  .attr("src", base_path + img_src)
+                                  .addClass("card-img-top")
+                              )
+                          );
+                        }
+                        if (data[i].membership_locked) {
+                          lockPath =
+                            "http://localhost:9080/img/post-lock-icon.png";
+                          $("#" + post_id).append(
+                            $("<img>")
+                              .attr("src", lockPath)
+                              .attr("id", "locked-post")
+                          );
+                        }
+                        if (data[i].poster_id == currentUserID) {
+                          crossPath = "http://localhost:9080/img/small-cross.png"
+                          $("#" + post_id).after(
+                              $("<a>")
+                              .attr("id", "deletable-post"+i)
+                              .addClass("deletable")
+                              .append(
+                                  $("<img>").attr("src", crossPath).attr("id","delete-img")
+                              )
+                            )
+                            deletePostListener("#deletable-post"+i,data[i].post_id)
+                      }
+                      }
+                    }
+                  },
+                  error: function (jqXHR) {
+                    // console.log(jqXHR);
+                    if (jqXHR.status === 403 || jqXHR.status === 401) {
+                      alert("403 or 401");
+                      window.location.replace("http://localhost:9080/login.html");
+                    }
+                  },
+                });
+              }
+            },
+            function (value) {}
+          );
+        },
+        error: function (jqXHR) {
+          window.location.replace("http://localhost:9080/feed.html");
+        },
+      });
+    },
+    error: function (jqXHR) {},
+  });
+}
+
 //get user profile
-$.ajax({
-  type: "POST",
-  url: userIDByNamePath,
-  data: userIDRequestJSON,
-  headers: {
-    "Content-type": "application/json",
-  },
-  success: function (data) {
-    let userProfileRequestBody =
-      '{"user_id":"' + data.user_id + '","full_info":true}';
-    userPageID = data.user_id;
 
-    $.ajax({
-      type: "POST",
-      url: user_data_endpoint, //here is an error
-      data: userProfileRequestBody,
-      headers: {
-        "Content-type": "application/json",
-      },
-      success: function (data) {
-        base_path = "http://localhost:9080/img/";
-        if (token === undefined || parseJwt(token).sub === userPageID) {
-          $("#userInfo").append(
-            $("<div>")
-              .addClass("p-5 text-center bg-light")
-              .append(
-                $("<img>")
-                  .attr("src", base_path + data.avatar_ref)
-                  .addClass("rounded-circle")
-                  .attr("height", "200")
-                  .attr("width", "200")
-                  .attr("loading", "lazy")
-              )
-              .append($("<h1>").addClass("mb-3").text(data.name))
-              .append(
-                $("<h4>")
-                  .addClass("mb-3")
-                  .text("Подписчики: " + data.subscriber_count)
-                  .attr("id", "sub_counter")
-              )
-          );
-        } else {
-          $("#userInfo").append(
-            $("<div>")
-              .addClass("p-5 text-center bg-light")
-              .append(
-                $("<img>")
-                  .attr("src", base_path + data.avatar_ref)
-                  .addClass("rounded-circle")
-                  .attr("height", "200")
-                  .attr("width", "200")
-                  .attr("loading", "lazy")
-              )
-              .append($("<h1>").addClass("mb-3").text(data.name))
-              .append(
-                $("<h4>")
-                  .addClass("mb-3")
-                  .text("Подписчики: " + data.subscriber_count)
-                  .attr("id", "sub_counter")
-              )
-              .append(
-                $("<a>").addClass("btn btn-primary").attr("id", "sub_button")
-              )
-          );
-          changeSubButton();
-          subscribeButtonClickListener();
-        }
-        var userPostsEndpoint = "http://localhost:8080/userposts";
-        let userPostsRequest = '{"poster_id":"' + userPageID + '"}';
-        getLoggedInUserID().then(
-          function (value) {
-            if (value === false) {
-              $.ajax({
-                type: "POST",
-                url: userPostsEndpoint,
-                data: userPostsRequest,
-                success: function (data) {
-                  console.log(data);
-                  if (data == null) {
-                    $("#posts").append(
-                      $("<p>").text("У пользователя еще нет записей")
-                    );
-                  } else {
-                    for (let i = 0; i < data.length; i++) {
-                      let post_id = "post_" + i;
-                      let img_src = data[i].image_ref;
-                      posted_at = data[i].posted_at;
-                      date = new Date(posted_at);
-                      const formattedDate = date.toLocaleString("ru", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      });
-                      if (img_src === undefined) {
-                        $("#posts").append(
-                          $("<div>")
-                            .addClass("card")
-                            .append(
-                              $("<div>")
-                                .addClass("card-body")
-                                .append(
-                                  $("<a>")
-                                    .addClass("d-flex justify-content-start")
-                                    .attr("id", "poster-data")
-                                    .attr(
-                                      "href",
-                                      profile_base_path +
-                                        data[i].poster_username
-                                    )
-                                    .append(
-                                      $("<img>")
-                                        .attr(
-                                          "src",
-                                          base_path + data[i].poster_avatar
-                                        )
-                                        .addClass("rounded-circle")
-                                        .attr("height", "30")
-                                        .attr("width", "30")
-                                        .attr("loading", "lazy")
-                                    )
-                                    .append(
-                                      $("<h5>")
-                                        .text(data[i].poster_username)
-                                        .attr("id", "post-name")
-                                    )
-                                    .attr("id", post_id)
-                                )
-                                .append(
-                                  $("<h6>")
-                                    .text(formattedDate)
-                                    .addClass(
-                                      "card-subtitle mb-2 text-muted d-flex justify-content-start"
-                                    )
-                                )
-                                .append(
-                                  $("<p>")
-                                    .addClass("card-text")
-                                    .text(data[i].body)
-                                )
-                            )
-                        );
-                      } else {
-                        $("#posts").append(
-                          $("<div>")
-                            .addClass("card")
-                            .append(
-                              $("<div>")
-                                .addClass("card-body")
-                                .append(
-                                  $("<a>")
-                                    .addClass("d-flex justify-content-start")
-                                    .attr("id", "poster-data")
-                                    .attr(
-                                      "href",
-                                      profile_base_path +
-                                        data[i].poster_username
-                                    )
-                                    .append(
-                                      $("<img>")
-                                        .attr(
-                                          "src",
-                                          base_path + data[i].poster_avatar
-                                        )
-                                        .addClass("rounded-circle")
-                                        .attr("height", "30")
-                                        .attr("width", "30")
-                                        .attr("loading", "lazy")
-                                    )
-                                    .append(
-                                      $("<h5>")
-                                        .text(data[i].poster_username)
-                                        .attr("id", "post-name")
-                                    )
-                                    .attr("id", post_id)
-                                )
-
-                                .append(
-                                  $("<h6>")
-                                    .text(formattedDate)
-                                    .addClass(
-                                      "card-subtitle mb-2 text-muted d-flex justify-content-start"
-                                    )
-                                )
-                                .append(
-                                  $("<p>")
-                                    .addClass("card-text")
-                                    .text(data[i].body)
-                                )
-                            )
-                            .append(
-                              $("<img>")
-                                .attr("src", base_path + img_src)
-                                .addClass("card-img-top")
-                            )
-                        );
-                      }
-                      if (data[i].membership_locked) {
-                        lockPath =
-                          "http://localhost:9080/img/post-lock-icon.png";
-                        $("#" + post_id).append(
-                          $("<img>")
-                            .attr("src", lockPath)
-                            .attr("id", "locked-post")
-                        );
-                      }
-                    }
-                  }
-                },
-                error: function (jqXHR) {
-                  console.log(jqXHR);
-                  if (jqXHR.status === 403 || jqXHR.status === 401) {
-                    alert("403 or 401");
-                    window.location.replace("http://localhost:9080/login.html");
-                  }
-                },
-              });
-            } else {
-              $.ajax({
-                type: "POST",
-                url: userPostsEndpoint,
-                data: userPostsRequest,
-                headers: {
-                  Authorization: "Bearer " + $.cookie("access_token"),
-                },
-                success: function (data) {
-                  console.log(data);
-                  if (data == null) {
-                    $("#posts").append(
-                      $("<p>").text("У пользователя еще нет записей")
-                    );
-                  } else {
-                    for (let i = 0; i < data.length; i++) {
-                      let post_id = "post_" + i;
-                      let img_src = data[i].image_ref;
-                      posted_at = data[i].posted_at;
-                      date = new Date(posted_at);
-                      const formattedDate = date.toLocaleString("ru", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      });
-                      if (img_src === undefined) {
-                        $("#posts").append(
-                          $("<div>")
-                            .addClass("card")
-                            .append(
-                              $("<div>")
-                                .addClass("card-body")
-                                .append(
-                                  $("<a>")
-                                    .addClass("d-flex justify-content-start")
-                                    .attr("id", "poster-data")
-                                    .attr(
-                                      "href",
-                                      profile_base_path +
-                                        data[i].poster_username
-                                    )
-                                    .append(
-                                      $("<img>")
-                                        .attr(
-                                          "src",
-                                          base_path + data[i].poster_avatar
-                                        )
-                                        .addClass("rounded-circle")
-                                        .attr("height", "30")
-                                        .attr("width", "30")
-                                        .attr("loading", "lazy")
-                                    )
-                                    .append(
-                                      $("<h5>")
-                                        .text(data[i].poster_username)
-                                        .attr("id", "post-name")
-                                    )
-                                    .attr("id", post_id)
-                                )
-                                .append(
-                                  $("<h6>")
-                                    .text(formattedDate)
-                                    .addClass(
-                                      "card-subtitle mb-2 text-muted d-flex justify-content-start"
-                                    )
-                                )
-                                .append(
-                                  $("<p>")
-                                    .addClass("card-text")
-                                    .text(data[i].body)
-                                )
-                            )
-                        );
-                      } else {
-                        $("#posts").append(
-                          $("<div>")
-                            .addClass("card")
-                            .append(
-                              $("<div>")
-                                .addClass("card-body")
-                                .append(
-                                  $("<a>")
-                                    .addClass("d-flex justify-content-start")
-                                    .attr("id", "poster-data")
-                                    .attr(
-                                      "href",
-                                      profile_base_path +
-                                        data[i].poster_username
-                                    )
-                                    .append(
-                                      $("<img>")
-                                        .attr(
-                                          "src",
-                                          base_path + data[i].poster_avatar
-                                        )
-                                        .addClass("rounded-circle")
-                                        .attr("height", "30")
-                                        .attr("width", "30")
-                                        .attr("loading", "lazy")
-                                    )
-                                    .append(
-                                      $("<h5>")
-                                        .text(data[i].poster_username)
-                                        .attr("id", "post-name")
-                                    )
-                                    .attr("id", post_id)
-                                )
-
-                                .append(
-                                  $("<h6>")
-                                    .text(formattedDate)
-                                    .addClass(
-                                      "card-subtitle mb-2 text-muted d-flex justify-content-start"
-                                    )
-                                )
-                                .append(
-                                  $("<p>")
-                                    .addClass("card-text")
-                                    .text(data[i].body)
-                                )
-                            )
-                            .append(
-                              $("<img>")
-                                .attr("src", base_path + img_src)
-                                .addClass("card-img-top")
-                            )
-                        );
-                      }
-                      if (data[i].membership_locked) {
-                        lockPath =
-                          "http://localhost:9080/img/post-lock-icon.png";
-                        $("#" + post_id).append(
-                          $("<img>")
-                            .attr("src", lockPath)
-                            .attr("id", "locked-post")
-                        );
-                      }
-                    }
-                  }
-                },
-                error: function (jqXHR) {
-                  console.log(jqXHR);
-                  if (jqXHR.status === 403 || jqXHR.status === 401) {
-                    alert("403 or 401");
-                    window.location.replace("http://localhost:9080/login.html");
-                  }
-                },
-              });
-            }
-          },
-          function (value) {}
-        );
-      },
-      error: function (jqXHR) {
-        window.location.replace("http://localhost:9080/feed.html");
-      },
-    });
-  },
-  error: function (jqXHR) {},
-});
 
 async function getUserIDByUsername(username) {
   return new Promise((resolve, reject) => {
@@ -528,7 +573,7 @@ async function getLoggedInUserID() {
         error: function (jqXHR) {
           if (jqXHR.status === 404) {
             logged_in_id = parseJwt($.cookie("access_token")).sub;
-            console.log(logged_in_id);
+            // console.log(logged_in_id);
             resolve(logged_in_id);
           } else {
             $.removeCookie("access_token", { path: "/" });
@@ -590,7 +635,7 @@ function buildTierDivs(
       .text("Уровни платной подписки")
   );
   if (userHasMembership) {
-    console.log(membership_data.tiers.length);
+    // console.log(membership_data.tiers.length);
     for (let i = 0; i < membership_data.tiers.length; i++) {
       $("#membership-tiers").append(
         $("<li>")
@@ -630,19 +675,12 @@ function buildTierDivs(
           );
         continue;
       }
-      console.log(userTiers);
+      // console.log(userTiers);
       if (userTiers !== undefined) {
-        console.log("USER TIERS - ", userTiers.length);
 
         let userSubbed = false;
         let currentTier;
         for (let index = 0; index < userTiers.length; index++) {
-          console.log("INDEX - ", index);
-          console.log(
-            userTiers[index].tier_id,
-            membership_data.tiers[i].id,
-            userTiers[index] == membership_data.tiers[i].id
-          );
           if (userTiers[index].tier_id == membership_data.tiers[i].id) {
             userSubbed = true;
             currentTier = userTiers[index];
@@ -673,7 +711,7 @@ function buildTierDivs(
           );
           btn_id = "#tier-btn"+i
           tier_id = membership_data.tiers[i].id
-          console.log(btn_id,tier_id)
+          // console.log(btn_id,tier_id)
           tierSubButtonListener(btn_id,tier_id)
         }
       } else {
@@ -682,7 +720,7 @@ function buildTierDivs(
         );
         btn_id = "#tier-btn"+i
         tier_id = membership_data.tiers[i].id
-        console.log(btn_id,tier_id)
+        // console.log(btn_id,tier_id)
         tierSubButtonListener(btn_id,tier_id)
       }
     }
@@ -717,7 +755,7 @@ async function getUserShop() {
   loggedInUserID = await getLoggedInUserID();
   shopData = await getUserShopByOwnerID(shopUserID);
   buildShopDiv(shopData)
-  console.log(shopData)
+  // console.log(shopData)
 }
 
 function buildShopDiv(shopData) {
@@ -769,8 +807,6 @@ function buildShopDiv(shopData) {
 
 }
 
-getUserShop();
-
 async function getUserTiers() {
   loggedInUserID = await getLoggedInUserID();
   owner_id = await getUserIDByUsername(username);
@@ -797,18 +833,15 @@ async function getUserTiers() {
 
 }
 
-getUserTiers();
 
 function tierSubButtonListener(btnID, tierID) {
 
   subscribePath = "http://localhost:8080/tiersubscribe";
-  console.log("listening to " + btnID)
   $(btnID).on("click", function () {
 
     userUUID = parseJwt($.cookie("access_token"));
     subTierJSON =
       '{"user_id":"' + userUUID.sub + '","tier_id":"' + tierID + '"}';
-      console.log(subTierJSON)
     $.ajax({
       type: "POST",
       url: subscribePath,
@@ -832,7 +865,7 @@ function tierSubButtonListener(btnID, tierID) {
 function subscribeButtonClickListener() {
   $("#sub_button").off();
 
-  subscribePath = "http://localhost:8080/subscribe";
+  subscribebtnPath = "http://localhost:8080/subscribe";
   unsubscribePath = "http://localhost:8080/unsubscribe";
 
   $("#sub_button").on("click", function () {
@@ -858,7 +891,7 @@ function subscribeButtonClickListener() {
     } else {
       $.ajax({
         type: "POST",
-        url: subscribePath,
+        url: subscribebtnPath,
         data: unsubJSON,
         headers: {
           Authorization: "Bearer " + $.cookie("access_token"),
@@ -876,3 +909,32 @@ function subscribeButtonClickListener() {
     }
   });
 }
+
+function deletePostListener(btnID, postID) {
+  deletePath = "http://localhost:8080/deletepost";
+  $(btnID).on("click", function () {
+
+    userUUID = parseJwt($.cookie("access_token"));
+    deletePostJSON ='{"post_id":"'+postID+'"}';
+    $.ajax({
+      type: "POST",
+      url: deletePath,
+      data: deletePostJSON,
+      headers: {
+        Authorization: "Bearer " + $.cookie("access_token"),
+      },
+      success: function (data) {
+        document.location.reload();
+      },
+      error: function (jqXHR) {
+        if (jqXHR.status === 403 || jqXHR.status === 401) {
+          window.location.replace("http://localhost:9080/login.html");
+        }
+      },
+    });
+  });
+}
+
+getUserShop();
+getPosts();
+getUserTiers();

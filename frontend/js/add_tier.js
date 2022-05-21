@@ -111,7 +111,9 @@ $(function () {
         var reduced = formData.reduce((acc, {name, value}) => ({...acc, [name]: value}),{}); // form the object
         reduced.price = parseInt(reduced.price, 10)
         textJSON = JSON.stringify(reduced)
-        console.log(reduced.name)
+    
+        reduced.rewards = reduced.rewards.replace(/(\r\n|\n|\r)/gm, "");
+        console.log(reduced.rewards)
 
         if (img_address==='') {
             $.ajax({

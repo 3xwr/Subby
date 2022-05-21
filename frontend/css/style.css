@@ -37,6 +37,18 @@ margin-right:3%;
 margin-top:10%;
 }
 
+.deletable{
+    cursor: pointer;
+    position: absolute;
+    top:4%;
+    right:4%;
+}
+
+#delete-img{
+    height: 20px;
+    width:20px;
+}
+
 #poster-data{
     margin-bottom: 5%;
     width: max-content;

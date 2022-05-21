@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"sort"
 	"time"
 	"user-service/internal/model"
 
@@ -66,6 +67,10 @@ func (db *Membership) GetMembershipInfo(membershipID string) (model.Membership, 
 		}
 		tiers = append(tiers, tier)
 	}
+
+	sort.Slice(tiers, func(i, j int) bool {
+		return tiers[i].Price < tiers[j].Price
+	})
 
 	membership.Tiers = tiers
 

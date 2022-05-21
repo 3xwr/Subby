@@ -58,7 +58,14 @@ div.form {
    background-color: green;
 }
 
+.ms-container {
+    width:97%;
+}
 #ms-tier-select {
     padding-top:3%;
     padding-bottom:5%;
+}
+
+.custom-header {
+    background-color: rgba(249,249,249,var(--mdb-bg-opacity))!important
 }

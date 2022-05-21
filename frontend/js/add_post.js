@@ -271,6 +271,10 @@ function buildTierDivs(membership_data, hasData) {
     $("#tier-select").hide();
     $(".form-check-input").prop("disabled", true);
   } else {
+    $('#tier-select').multiSelect({
+      selectableHeader: "<div class='custom-header'>Доступные уровни</div>",
+      selectionHeader: "<div class='custom-header'>Выбранные уровни</div>"
+    });
     $("#tier-select").multiSelect({ keepOrder: true });
     for (let i = 0; i < membership_data.tiers.length; i++) {
       tier = membership_data.tiers[i];
