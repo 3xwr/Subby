@@ -34,12 +34,6 @@ type ShopService interface {
 }
 
 func (h *Shop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	userIDToken, err := getUserID(r)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("Invalid incoming data")
-		writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
-		return
-	}
 	if r.Method == http.MethodPost {
 		if r.URL.String() == ShopPath {
 			var shopRequest model.GetShopRequest
@@ -58,8 +52,14 @@ func (h *Shop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			writeResponse(w, http.StatusOK, shopItems)
 		}
 		if r.URL.String() == AddItemPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var shopItem model.AddItemRequest
-			err := json.NewDecoder(r.Body).Decode(&shopItem)
+			err = json.NewDecoder(r.Body).Decode(&shopItem)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})
@@ -73,8 +73,14 @@ func (h *Shop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if r.URL.String() == DeleteItemPath {
+			userIDToken, err := getUserID(r)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("Invalid incoming data")
+				writeResponse(w, http.StatusUnauthorized, model.Error{Error: "Unauthorized"})
+				return
+			}
 			var shopItem model.DeleteItemRequest
-			err := json.NewDecoder(r.Body).Decode(&shopItem)
+			err = json.NewDecoder(r.Body).Decode(&shopItem)
 			if err != nil {
 				h.logger.Error().Err(err).Msg("Invalid incoming data")
 				writeResponse(w, http.StatusBadRequest, model.Error{Error: "Bad Request"})

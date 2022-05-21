@@ -1,0 +1,69 @@
+.bg-light {
+  background-color: rgba(240, 240, 240, var(--mdb-bg-opacity)) !important;
+}
+
+body {
+  background-color: rgba(249, 249, 249, var(--mdb-bg-opacity)) !important;
+}
+
+html {
+  background-color: rgba(249, 249, 249, var(--mdb-bg-opacity)) !important;
+}
+
+a,
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+.card-img-top {
+  border-top-left-radius: calc(0.5rem - 1px);
+  border-top-right-radius: calc(0.5rem - 1px);
+  border-bottom-left-radius: calc(0.5rem - 1px);
+  border-bottom-right-radius: calc(0.5rem - 1px);
+}
+
+#tier-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-top-left-radius: calc(0.5rem - 1px);
+  border-top-right-radius: calc(0.5rem - 1px);
+  border-bottom-left-radius: calc(0.5rem - 1px);
+  border-bottom-right-radius: calc(0.5rem - 1px);
+}
+
+
+.card  {
+  height: 100%;
+}
+
+.body {
+  background-color: rgba(249, 249, 249, var(--mdb-bg-opacity)) !important;
+}
+
+.container {
+  background-color: rgba(249, 249, 249, var(--mdb-bg-opacity)) !important;
+}
+
+
+#column {
+  box-sizing: border-box;
+  margin-bottom: 2%;
+}
+.card-text {
+  font-weight: 350;
+  font-size: 1rem;
+}
+
+h5 {
+  margin: 0;
+}
+
+h6 {
+  font-size: 0.9rem;
+  margin: 0;
+}

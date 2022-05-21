@@ -461,7 +461,9 @@ $.ajax({
           function (value) {}
         );
       },
-      error: function (jqXHR) {},
+      error: function (jqXHR) {
+        window.location.replace("http://localhost:9080/feed.html");
+      },
     });
   },
   error: function (jqXHR) {},
@@ -482,6 +484,9 @@ async function getUserIDByUsername(username) {
       success: function (data) {
         resolve(data.user_id);
       },
+      error: function() {
+        window.location.replace("http://localhost:9080/feed.html");
+      }
     });
   });
 }
