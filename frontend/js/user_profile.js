@@ -696,6 +696,81 @@ function buildTierDivs(
   }
 }
 
+async function getUserShopByOwnerID(id) {
+  let getShopPath = "http://localhost:8080/shop";
+  let shopRequestJSON = '{"owner_id":"' + id + '"}';
+  return new Promise((resolve) => {
+    $.ajax({
+      type: "POST",
+      url: getShopPath,
+      data: shopRequestJSON,
+      success: function (data) {
+        resolve(data);
+      },
+      error: function (jqXHR) {},
+    });
+  });
+}
+
+async function getUserShop() {
+  shopUserID = await getUserIDByUsername(username);
+  loggedInUserID = await getLoggedInUserID();
+  shopData = await getUserShopByOwnerID(shopUserID);
+  buildShopDiv(shopData)
+  console.log(shopData)
+}
+
+function buildShopDiv(shopData) {
+  baseImgPath = "http://localhost:9080/img/"
+  shopPath = "http://localhost:9080/user_shop.html?user="
+
+  if (shopData !== null) {
+    $("#shop-info")
+    .append(
+        $("<div>")
+          .addClass("card-header")
+          .text("Магазин")
+          .attr("id","shop-showcase")
+    )
+    .append(
+      $("<img>")
+          .addClass("card-img-top")
+          .attr("src", baseImgPath+shopData[0].image_ref)
+    )
+    .append(
+      $("<h5>")
+          .addClass("card-body")
+          .attr("id","shop-showcase-name")
+          .text(shopData[0].name)
+    )
+    .append(
+      $("<h6>")
+        .addClass("text-muted")
+        .text(shopData[0].price+"₽")
+    )
+    .append(
+      $("<a>").addClass("btn btn-primary").text("В магазин").attr("id","toShopBtn")
+      .attr("href",shopPath+username)
+    )
+  } else {
+    $("#shop-info")
+    .append(
+      $("<h5>")
+        .text("Магазин")
+        .attr("id","shop-showcase")
+  )
+    .append(
+      $("<h6>")
+      .addClass("text-muted")
+      .text("У пользователя пока нет товаров.")
+    )
+  }
+
+
+}
+
+getUserShop();
+
 async function getUserTiers() {
   loggedInUserID = await getLoggedInUserID();
   owner_id = await getUserIDByUsername(username);

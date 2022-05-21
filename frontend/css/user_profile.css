@@ -70,6 +70,11 @@
     margin:0;
   }
 
+  #logged-in-user{
+    margin-right:3%;
+    margin-top:10%;
+    }
+
   .list-group-item:last-child {
     border-bottom:none;
     border-bottom-left-radius: calc(0.5rem - 1px);
@@ -85,4 +90,25 @@
 
 #subbed-label {
   margin-bottom: 0;
+}
+
+#shop-info {
+  width: 70%;
+}
+
+#shop-showcase {
+  font-family: var(--mdb-font-roboto);
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #4f4f4f;
+    padding: 0;
+}
+
+#shop-showcase-name {
+  padding: 0;
+}
+
+#toShopBtn{
+  margin-bottom: 3%;
+  margin-top: 3%;
 }

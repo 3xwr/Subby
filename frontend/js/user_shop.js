@@ -98,7 +98,7 @@ function buildDivs(shopData) {
   $("#shop-content")
     .append($("<div>").addClass("row"))
     .before(
-      $("<p>")
+      $("<h2>")
         .text("Магазин " + username)
         .attr("id", "shop-title")
     );
@@ -113,10 +113,6 @@ function buildItemCard(item) {
   let item_div = $("<div>")
     .addClass("col-md-3")
     .attr("id","column")
-    // .append(
-    //   $("<div>")
-    //   .text("COLUMN TEXT")
-    // )
     .append(
       $("<div>")
       .addClass("card")
@@ -129,10 +125,15 @@ function buildItemCard(item) {
         $("<div>")
           .addClass("card-body")
           .append($("<h5>").addClass("card-title").text(item.name))
-          .append(
-            $("<h6>").addClass("card-subtitle mb-2 text-muted").text(item.price)
-          )
-          .append($("<p>").addClass("card-text").text(item.description))
+          .append($("<p>").addClass("card-text").text(item.description)
+      )
+      )
+      .append(
+        $("<div>")
+        .addClass("card-footer")
+        .append(
+          $("<a>").addClass("btn btn-primary").text(item.price+" ₽").attr("id","buyBtn")
+        )
       )
     )
     
