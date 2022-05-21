@@ -96,19 +96,31 @@ async function getUserShopByOwnerID(id) {
 
 function buildDivs(shopData) {
   $("#shop-content")
-    .append($("<div>").addClass("row"))
-    .before(
-      $("<h2>")
-        .text("Магазин " + username)
-        .attr("id", "shop-title")
-    );
-  for (let index = 0; index < shopData.length; index++) {
-    const element = shopData[index];
-    $(".row").append(buildItemCard(element));
+  .append($("<div>").addClass("row"))
+  .before(
+    $("<h2>")
+      .text("Магазин " + username)
+      .attr("id", "shop-title")
+  );
+  if (shopData === null ){
+    $("#shop-title")
+    .append(
+      $("<h5>")
+      .text("У пользователя нет товаров.")
+      .addClass("text-muted")
+      .attr("id","no-items")
+    )
+  } else {
+    for (let index = 0; index < shopData.length; index++) {
+      const element = shopData[index];
+      $(".row").append(buildItemCard(element,index));
+    }
   }
+
+
 }
 
-function buildItemCard(item) {
+function buildItemCard(item,id) {
   baseImgPath = "http://localhost:9080/img/";
   let item_div = $("<div>")
     .addClass("col-md-3")
@@ -131,13 +143,59 @@ function buildItemCard(item) {
       .append(
         $("<div>")
         .addClass("card-footer")
+        .attr("id","item"+id)
         .append(
           $("<a>").addClass("btn btn-primary").text(item.price+" ₽").attr("id","buyBtn")
         )
       )
     )
+    getLoggedInUserID().then(
+      function(value) {
+        if(value!==false){
+          if (item.owner_id == value) {
+            crossPath = "http://localhost:9080/img/small-cross.png"
+            $("#item" + id).after(
+                $("<a>")
+                .attr("id", "deletable-item"+id)
+                .addClass("deletable")
+                .append(
+                    $("<img>").attr("src", crossPath).attr("id","delete-img")
+                )
+              )
+              deleteItemListener("#deletable-item"+id,item.id)
+        }
+        }
+      }
+    )
+    
     
   return item_div;
+}
+
+function deleteItemListener(btnID, itemID) {
+  deleteItemPath = "http://localhost:8080/deleteitem";
+  console.log("listening to "+btnID+", id:"+itemID)
+  $(btnID).on("click", function () {
+
+    userUUID = parseJwt($.cookie("access_token"));
+    deleteItemJSON ='{"item_id":"'+itemID+'"}';
+    $.ajax({
+      type: "POST",
+      url: deleteItemPath,
+      data: deleteItemJSON,
+      headers: {
+        Authorization: "Bearer " + $.cookie("access_token"),
+      },
+      success: function (data) {
+        document.location.reload();
+      },
+      error: function (jqXHR) {
+        if (jqXHR.status === 403 || jqXHR.status === 401) {
+          window.location.replace("http://localhost:9080/login.html");
+        }
+      },
+    });
+  });
 }
 
 async function doStuff() {

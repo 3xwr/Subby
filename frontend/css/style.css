@@ -45,8 +45,8 @@ margin-top:10%;
 }
 
 #delete-img{
-    height: 20px;
-    width:20px;
+    height: 10px;
+    width:10px;
 }
 
 #poster-data{
@@ -100,4 +100,20 @@ a, a:hover, a:focus, a:active {
     padding-left: 5px;
     width:20px;
     height: 20px;
+}
+
+
+.form-control {
+    background-color: white;
+}
+#search-input {
+    background-color: white;
+}
+
+input {
+    background-color: white !important;
+}
+
+textarea{
+    background-color: white  !important;
 }

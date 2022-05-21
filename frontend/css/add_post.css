@@ -69,3 +69,8 @@ div.form {
 .custom-header {
     background-color: rgba(249,249,249,var(--mdb-bg-opacity))!important
 }
+
+#body-label {
+    text-align: center;
+    margin-bottom: 10%;
+}

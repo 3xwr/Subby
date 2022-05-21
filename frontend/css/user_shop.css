@@ -83,3 +83,19 @@ h6 {
   font-size: 0.9rem;
   margin: 0;
 }
+
+.deletable{
+  cursor: pointer;
+  position: absolute;
+  top:4%;
+  right:4%;
+}
+
+#delete-img{
+  height: 10px;
+  width:10px;
+}
+
+#no-items {
+  margin-top:5%;
+}

@@ -635,7 +635,7 @@ function buildTierDivs(
       .text("Уровни платной подписки")
   );
   if (userHasMembership) {
-    // console.log(membership_data.tiers.length);
+    let currentlyLoggedInUserId = getLoggedInUserID();
     for (let i = 0; i < membership_data.tiers.length; i++) {
       $("#membership-tiers").append(
         $("<li>")
@@ -644,6 +644,7 @@ function buildTierDivs(
           .append(
             $("<h5>", "")
               .attr("id", "tier-name")
+              .addClass("tier"+i)
               .text(membership_data.tiers[i].name)
           )
           .append(
@@ -653,6 +654,19 @@ function buildTierDivs(
               .text(membership_data.tiers[i].price + "₽ в месяц")
           )
       );
+      console.log(currentUserID)
+      if (membership_data.owner_id == currentUserID) {
+        crossPath = "http://localhost:9080/img/small-cross.png"
+        $(".tier" + i).after(
+            $("<a>")
+            .attr("id", "deletable-tier"+i)
+            .addClass("deletable")
+            .append(
+                $("<img>").attr("src", crossPath).attr("id","delete-img")
+            )
+          )
+          deleteTierListener("#tier"+i,membership_data.tiers[i].id)
+    }
       if (membership_data.tiers[i].image_ref !== undefined) {
         imgBasePath = "http://localhost:9080/img/";
         $("#tier" + i).append(
@@ -919,6 +933,32 @@ function deletePostListener(btnID, postID) {
     $.ajax({
       type: "POST",
       url: deletePath,
+      data: deletePostJSON,
+      headers: {
+        Authorization: "Bearer " + $.cookie("access_token"),
+      },
+      success: function (data) {
+        document.location.reload();
+      },
+      error: function (jqXHR) {
+        if (jqXHR.status === 403 || jqXHR.status === 401) {
+          window.location.replace("http://localhost:9080/login.html");
+        }
+      },
+    });
+  });
+}
+
+function deleteTierListener(btnID, tierID) {
+  deleteTierPath = "http://localhost:8080/deletetier";
+  console.log("listening to "+btnID+", id:"+tierID)
+  $(btnID).on("click", function () {
+
+    userUUID = parseJwt($.cookie("access_token"));
+    deletePostJSON ='{"tier_id":"'+tierID+'"}';
+    $.ajax({
+      type: "POST",
+      url: deleteTierPath,
       data: deletePostJSON,
       headers: {
         Authorization: "Bearer " + $.cookie("access_token"),
