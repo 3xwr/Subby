@@ -227,13 +227,18 @@ func (db *Content) GetUserFeed(userID string, amount int) ([]model.Post, error) 
 	for i, post := range posts {
 		for _, postTier := range *post.MembershipTiers {
 			if post.MembershipLocked {
-				locked := true
-				for _, tier := range tiers {
-					t1 := postTier.String()
-					t2 := tier.ID.String()
-					if (t1 == t2) || (userUUID == post.PosterID) {
-						locked = false
-						break
+				var locked bool
+				if userUUID == post.PosterID {
+					locked = false
+				} else {
+					locked = true
+					for _, tier := range tiers {
+						t1 := postTier.String()
+						t2 := tier.ID.String()
+						if t1 == t2 {
+							locked = false
+							break
+						}
 					}
 				}
 				if locked {
@@ -323,13 +328,18 @@ func (db *Content) GetUserPosts(posterID uuid.UUID, loggedInID *uuid.UUID, amoun
 		for i, post := range posts {
 			for _, postTier := range *post.MembershipTiers {
 				if post.MembershipLocked {
-					locked := true
-					for _, tier := range tiers {
-						t1 := postTier.String()
-						t2 := tier.ID.String()
-						if (t1 == t2) || (*loggedInID == post.PosterID) {
-							locked = false
-							break
+					var locked bool
+					if *loggedInID == post.PosterID {
+						locked = false
+					} else {
+						locked = true
+						for _, tier := range tiers {
+							t1 := postTier.String()
+							t2 := tier.ID.String()
+							if t1 == t2 {
+								locked = false
+								break
+							}
 						}
 					}
 					if locked {

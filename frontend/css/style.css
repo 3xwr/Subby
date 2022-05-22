@@ -49,6 +49,14 @@ margin-top:10%;
     width:10px;
 }
 
+#register-link {
+    margin-top: 2%;
+}
+
+#link-reg {
+    color: blue;
+}
+
 #poster-data{
     margin-bottom: 5%;
     width: max-content;

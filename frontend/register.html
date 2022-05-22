@@ -76,7 +76,7 @@
       <div class="d-flex align-items-center">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="#">Войти</a>
+              <a class="nav-link" href="http://localhost:9080/login.html">Войти</a>
             </li>
           </ul>
         <!-- Avatar -->
@@ -89,17 +89,29 @@
   <div class="form" name="login-form">
   <form>
     <input type="text" style="display:none">
-    <input type="password" style="display:none">
+<input type="password" style="display:none">
     <!-- Username input -->
     <div class="form-outline mb-4">
       <input name="username" type="text"  id="form1Example1" class="form-control" />
       <label class="form-label" for="form1Example1">Имя пользователя</label>
     </div>
+
+     <!-- Password repeat input -->
+     <div class="form-outline mb-4">
+      <input type="email" name="email" id="registerEmail" class="form-control"  />
+      <label class="form-label" for="registerEmail">Почта</label>
+    </div>
   
     <!-- Password input -->
     <div class="form-outline mb-4">
-      <input name="password" type="password" id="form1Example2" class="form-control"  />
-      <label class="form-label" for="form1Example2">Пароль</label>
+      <input name="password" type="password" id="registerPassword" class="form-control"  />
+      <label class="form-label" for="registerPassword">Пароль</label>
+    </div>
+
+    <!-- Password repeat input -->
+    <div class="form-outline mb-4">
+      <input type="password" name="repeat_password" id="registerRepeatPassword" class="form-control"  />
+      <label class="form-label" for="registerRepeatPassword">Повторите пароль</label>
     </div>
   
     <!-- 2 column grid layout for inline styling -->
@@ -108,17 +120,16 @@
       </div>
   
     </div>
-    <div class="alert alert-danger" role="alert" id="login-error">
+    <div class="alert alert-danger" role="alert" id="register-error">
         Неправильный логин или пароль
     </div>
       
   
     <!-- Submit button -->
     <button type="submit" class="btn btn-primary btn-block" id="btn">Войти</button>
-      <!-- Register buttons -->
-  <div class="text-center" id="register-link">
-    <p>Нет учетной записи? <a href="http://localhost:9080/register.html" id="link-reg">Зарегистрируйтесь</a></p>
-  </div>
+    <div class="text-center" id="register-link">
+      <p>Уже зарегистрированы? <a href="http://localhost:9080/login.html"  id="link-reg">Войти</a></p>
+    </div>
   </form>
   
 </div>
@@ -130,7 +141,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/checklogin.js"></script>
-    <script type="text/javascript" src="js/login.js"></script>
+    <script type="text/javascript" src="js/register.js"></script>
     <script type="text/javascript" src="js/search_bar.js"></script>
   </body>
 </html>

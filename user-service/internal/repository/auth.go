@@ -91,6 +91,17 @@ func (db *Auth) SaveUser(username string, password string) error {
 		return err
 	}
 
+	membershipID, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO memberships (id,owner_id) VALUES ($1,$2)", membershipID, userID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return err
