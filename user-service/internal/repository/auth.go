@@ -49,7 +49,7 @@ func (db *Auth) SaveToken(userID uuid.UUID, token string) error {
 	return nil
 }
 
-func (db *Auth) SaveUser(username string, password string) error {
+func (db *Auth) SaveUser(username string, email string, password string) error {
 	var name string
 
 	err := db.QueryRow("SELECT username FROM users WHERE username = $1", username).Scan(&name)
@@ -73,7 +73,7 @@ func (db *Auth) SaveUser(username string, password string) error {
 	}
 
 	defaultAvatarRef := "default_avatar.png"
-	_, err = tx.ExecContext(ctx, "INSERT INTO users (id, username, password, avatar_ref) VALUES ($1, $2, $3, $4) ON CONFLICT (username) DO NOTHING", userID, username, hash(password), defaultAvatarRef)
+	_, err = tx.ExecContext(ctx, "INSERT INTO users (id, email, username, password, avatar_ref) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (username) DO NOTHING", userID, email, username, hash(password), defaultAvatarRef)
 	if err != nil {
 		tx.Rollback()
 		return err

@@ -102,6 +102,7 @@ func main() {
 		r.Method(http.MethodPost, handler.SubscribeToMembershipTierPath, membershipHandler)
 		r.Method(http.MethodPost, handler.ChangeAvatarPath, userHandler)
 		r.Method(http.MethodPost, handler.ChangePasswordPath, authHandler)
+		r.Method(http.MethodPost, handler.UserPrivateDataPath, userHandler)
 	})
 
 	srv := http.Server{

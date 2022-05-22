@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 	"user-service/internal/model"
 
 	"github.com/google/uuid"
@@ -46,9 +47,21 @@ func (db *User) ChangeUserAvatar(userID uuid.UUID, avatarRef string) error {
 	return nil
 }
 
+func (db *User) GetUserPrivateData(userID uuid.UUID) (model.User, error) {
+	var u model.User
+	sqlQuery := `SELECT u.id, u.email, u.username
+	FROM users u
+	WHERE u.id=$1`
+	err := db.QueryRow(sqlQuery, userID).Scan(&u.ID, &u.Email, &u.Name)
+	if err != nil {
+		return model.User{}, err
+	}
+	return u, nil
+}
+
 func (db *User) GetFullUserPublicData(userID uuid.UUID) (model.User, error) {
 	var u model.User
-	sqlQuery := `SELECT u.id, u.username, u.avatar_ref, c.cnt
+	sqlQuery := `SELECT u.id, u.email, u.username, u.avatar_ref, c.cnt
 	FROM users u
 	INNER JOIN (select subbed_to_user_id,count(subbed_to_user_id) as cnt
 				FROM user_subs
@@ -61,10 +74,12 @@ func (db *User) GetFullUserPublicData(userID uuid.UUID) (model.User, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		if err := rows.Scan(&u.ID, &u.Name, &u.AvatarRef, &u.SubscriberCount); err != nil {
+		if err := rows.Scan(&u.ID, &u.Email, &u.Name, &u.AvatarRef, &u.SubscriberCount); err != nil {
 			return u, err
 		}
 	}
+
+	fmt.Println(u)
 
 	return u, nil
 }

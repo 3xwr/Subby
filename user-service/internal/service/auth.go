@@ -34,7 +34,7 @@ func NewAuth(logger *zerolog.Logger, repo AuthRepo, secret []byte) *Auth {
 type AuthRepo interface {
 	GetUser(string, string) (*model.User, error)
 	SaveToken(uuid.UUID, string) error
-	SaveUser(string, string) error
+	SaveUser(string, string, string) error
 	ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error
 }
 
@@ -58,8 +58,8 @@ func (s *Auth) Authenticate(username string, password string) (string, string, e
 	return accessToken, refreshToken, nil
 }
 
-func (s *Auth) Register(username string, password string) error {
-	err := s.repo.SaveUser(username, password)
+func (s *Auth) Register(username string, email string, password string) error {
+	err := s.repo.SaveUser(username, email, password)
 	if err != nil {
 		return err
 	}

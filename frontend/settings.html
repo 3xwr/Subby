@@ -20,11 +20,12 @@
     <!-- MDB -->
     <link rel="stylesheet" href="css/mdb.min.css" />
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/settings.css" rel="stylesheet">
   </head>
   <body>
     <!-- Start your project here-->
    <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+   <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <!-- Container wrapper -->
     <div class="container-fluid">
       <!-- Toggle button -->
@@ -39,30 +40,52 @@
       >
         <i class="fas fa-bars"></i>
       </button>
-  
+
       <!-- Collapsible wrapper -->
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <!-- Navbar brand -->
-      <a class="navbar-brand mt-2 mt-lg-0" href="#">
-        <img
-          src="http://localhost:9080/img/bank-card-euro.png"
-          height = "40"
-          alt="Subby Logo"
-          loading="lazy"
-        />
-      </a>
+        <!-- Navbar brand -->
+        <a class="navbar-brand mt-2 mt-lg-0" href="#">
+          <img
+            src="http://localhost:9080/img/bank-card-euro.png"
+            height="40"
+            alt="Subby Logo"
+            loading="lazy"
+          />
+        </a>
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="feed.html">Домой</a>
+            <a class="nav-link" href="feed.html">Новости</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link only-logged-in" href="add_post.html"
+              >Добавить запись</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link only-logged-in" href="manage_membership.html"
+              >Управление подпиской</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link only-logged-in" href="add_shopitem.html">Добавить товар</a>
+          </li> 
           <li class="nav-item">
             <div class="input-group">
               <div class="form-outline">
-                <input id="search-input" type="search" id="form1" class="form-control" />
+                <input
+                  id="search-input"
+                  type="search"
+                  id="form1"
+                  class="form-control"
+                />
                 <label class="form-label" for="form1">Поиск</label>
               </div>
-              <button id="search-button" type="button" class="btn btn-primary">
+              <button
+                id="search-button"
+                type="button"
+                class="btn btn-primary"
+              >
                 <i class="fas fa-search"></i>
               </button>
             </div>
@@ -71,16 +94,9 @@
         <!-- Left links -->
       </div>
       <!-- Collapsible wrapper -->
-  
+
       <!-- Right elements -->
-      <div class="d-flex align-items-center">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" href="http://localhost:9080/login.html">Войти</a>
-            </li>
-          </ul>
-        <!-- Avatar -->
-      </div>
+      <div class="d-flex align-items-center" id="right-navbar"></div>
       <!-- Right elements -->
     </div>
     <!-- Container wrapper -->
@@ -88,21 +104,21 @@
   <!-- Navbar -->
   <div class="form" name="login-form">
     <h5 id="body-label">Настройки</h5>
-  <form>
+  <form id="upload-form">
     <input type="text" style="display:none">
 
 <input type="password" style="display:none">
     <!-- Username input -->
     <h5 id="body-label">Данные</h5>
     <div class="form-outline mb-4">
-      <input name="username" type="text" disabled id="form1Example1" class="form-control disabled-field" />
-      <label class="form-label" for="form1Example1" >Имя пользователя</label>
+      <input name="username" type="text" disabled id="username" class="form-control disabled-field" />
+      <label class="form-label" for="username" id="username-label" >Имя пользователя</label>
     </div>
 
      <!-- Password repeat input -->
      <div class="form-outline mb-4">
       <input type="email" name="email" id="registerEmail" disabled class="form-control disabled-field"  />
-      <label class="form-label" for="registerEmail">Почта</label>
+      <label class="form-label" for="registerEmail" id="email-label">Почта</label>
     </div>
   
     <h5 id="body-label">Изменить пароль</h5>
@@ -122,7 +138,14 @@
       <input type="password" name="repeat_password" id="repeatPassword" class="form-control"  />
       <label class="form-label" for="repeatPassword">Повторите пароль</label>
     </div>
-    <button type="submit" class="btn btn-primary btn-block" id="btn">Изменить пароль</button>
+    <button type="submit" class="btn btn-primary btn-block" id="btn-change-password">Изменить пароль</button>
+    <div class="alert alert-danger" role="alert" id="password-error">
+      Неправильный логин или пароль
+    </div>
+    <div class="alert alert-success" role="alert" id="password-ok">
+      Пароль успешно обновлен!
+    </div>
+
 
     <h5 id="body-label">Изменить аватар</h5>
 
@@ -140,7 +163,7 @@
       <input type="file" class="form-control" name="img" />
     </div>
 
-    <button type="submit" class="btn btn-primary btn-block" id="btn">Изменить аватар</button>
+    <button type="submit" class="btn btn-primary btn-block" id="btn-change-avatar">Изменить аватар</button>
   
     <!-- 2 column grid layout for inline styling -->
     <div class="row mb-4">
@@ -148,8 +171,11 @@
       </div>
   
     </div>
-    <div class="alert alert-danger" role="alert" id="register-error">
+    <div class="alert alert-danger" role="alert" id="avatar-error">
         Неправильный логин или пароль
+    </div>
+    <div class="alert alert-success" role="alert" id="avatar-ok">
+      Пароль успешно обновлен!
     </div>
       
   
@@ -165,7 +191,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script type="text/javascript" src="js/checklogin.js"></script>
-    <script type="text/javascript" src="js/register.js"></script>
+    <script type="text/javascript" src="js/loadprofile.js"></script>
+    <script type="text/javascript" src="js/settings.js"></script>
     <script type="text/javascript" src="js/search_bar.js"></script>
   </body>
 </html>

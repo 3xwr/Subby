@@ -18,7 +18,7 @@ type Register struct {
 }
 
 type RegisterService interface {
-	Register(string, string) error
+	Register(string, string, string) error
 }
 
 func NewRegister(logger *zerolog.Logger, srv RegisterService) *Register {
@@ -29,7 +29,7 @@ func NewRegister(logger *zerolog.Logger, srv RegisterService) *Register {
 }
 
 func (h *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	req := &model.AuthRequest{}
+	req := &model.RegisterRequest{}
 
 	err := json.NewDecoder(r.Body).Decode(req)
 	if err != nil {
@@ -39,7 +39,7 @@ func (h *Register) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//TODO: Check password strength
-	err = h.service.Register(req.Username, req.Password)
+	err = h.service.Register(req.Username, req.Email, req.Password)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("Registration error")
 		if err.Error() == model.UserExistsError {

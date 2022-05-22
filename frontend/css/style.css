@@ -130,3 +130,7 @@ textarea{
 .disabled-field {
     background-color: #e9ecef!important;
 }
+
+checkbox {
+    background-color: blue;
+}

@@ -23,6 +23,7 @@ type UserIDResponse struct {
 type User struct {
 	ID              uuid.UUID `json:"id"`
 	Name            string    `json:"name"`
+	Email           string    `json:"email"`
 	AvatarRef       string    `json:"avatar_ref"`
 	SubscriberCount int64     `json:"subscriber_count,omitempty"`
 }

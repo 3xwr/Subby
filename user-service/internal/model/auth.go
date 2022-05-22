@@ -9,6 +9,12 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type Error struct {
 	Error string `json:"error"`
 }

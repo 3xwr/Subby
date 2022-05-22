@@ -271,27 +271,33 @@ function buildTierDivs(membership_data, hasData) {
     $("#tier-select").hide();
     $(".form-check-input").prop("disabled", true);
   } else {
-    $('#tier-select').multiSelect({
-      selectableHeader: "<div class='custom-header'>Доступные уровни</div>",
-      selectionHeader: "<div class='custom-header'>Выбранные уровни</div>"
-    });
-    $("#tier-select").multiSelect({ keepOrder: true });
-    for (let i = 0; i < membership_data.tiers.length; i++) {
-      tier = membership_data.tiers[i];
-      $("#tier-select").multiSelect("addOption", {
-        value: tier.id,
-        text: tier.name,
+    if (membership_data.tiers !== null) {
+      $('#tier-select').multiSelect({
+        selectableHeader: "<div class='custom-header'>Доступные уровни</div>",
+        selectionHeader: "<div class='custom-header'>Выбранные уровни</div>"
       });
-    }
-    $("#tier-select").next().hide();
-    $(".form-check-input").on("click", function () {
-      var checkbox = $(this);
-
-      if (checkbox.is(":checked")) {
-        $("#tier-select").next().show(300);
-      } else {
-        $("#tier-select").next().hide(200);
+      $("#tier-select").multiSelect({ keepOrder: true });
+      for (let i = 0; i < membership_data.tiers.length; i++) {
+        tier = membership_data.tiers[i];
+        $("#tier-select").multiSelect("addOption", {
+          value: tier.id,
+          text: tier.name,
+        });
       }
-    });
+      $("#tier-select").next().hide();
+      $(".form-check-input").on("click", function () {
+        var checkbox = $(this);
+  
+        if (checkbox.is(":checked")) {
+          $("#tier-select").next().show(300);
+        } else {
+          $("#tier-select").next().hide(200);
+        }
+      });
+    } else {
+      $("#tier-select").hide();
+      $(".form-check-input").prop("disabled", true);
+    }
+ 
   }
 }

@@ -43,7 +43,7 @@ $(function () {
         } else if (reduced.username.length < 4) {
             showErrorMessage("register-error","Имя пользователя должно быть хотя бы 4 символа в длину")
         } else {
-            let regJSON = '{"username":"'+reduced.username+'","password":"'+reduced.password+'"}'
+            let regJSON = '{"username":"'+reduced.username+'","email":"'+reduced.email+'","password":"'+reduced.password+'"}'
             sendRegisterRequest(registerURL, regJSON)
         }
         
@@ -73,6 +73,7 @@ function sendRegisterRequest(url, json) {
 
 function sendAuthRequest(json) {
     authRequestURL = "http://localhost:8080/auth"
+    authJSON = '{"username":"'+json.username+'","password":"'+json.password+'"}'
     $.ajax({
         type: "POST",
         url: authRequestURL,

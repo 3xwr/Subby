@@ -205,7 +205,18 @@ func (h *Membership) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				writeResponse(w, http.StatusInternalServerError, model.Error{Error: "Get user tiers error"})
 				return
 			}
-			writeResponse(w, http.StatusOK, tiers)
+			w.Header().Set("Content-Type", "application/json")
+			if len(tiers) == 0 {
+				tiers = make([]model.UserSubscribedTier, 0)
+			}
+			b, err := json.Marshal(tiers)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(`{"error":"Internal server error"}`))
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(b))
 		}
 	}
 }

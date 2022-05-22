@@ -634,7 +634,8 @@ function buildTierDivs(
       .attr("id", "membership-tiers")
       .text("Уровни платной подписки")
   );
-  if (userHasMembership) {
+  console.log(membership_data)
+  if (userHasMembership && membership_data.tiers!==null) {
     let currentlyLoggedInUserId = getLoggedInUserID();
     for (let i = 0; i < membership_data.tiers.length; i++) {
       $("#membership-tiers").append(
@@ -690,7 +691,7 @@ function buildTierDivs(
         continue;
       }
       // console.log(userTiers);
-      if (userTiers !== undefined) {
+      if (userTiers !== undefined && userTiers !== null) {
 
         let userSubbed = false;
         let currentTier;

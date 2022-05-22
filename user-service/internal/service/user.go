@@ -23,6 +23,7 @@ type UserRepo interface {
 	GetUserPublicData(userID uuid.UUID) (model.User, error)
 	GetUserIDByName(name string) (uuid.UUID, error)
 	GetFullUserPublicData(userID uuid.UUID) (model.User, error)
+	GetUserPrivateData(userID uuid.UUID) (model.User, error)
 	ChangeUserAvatar(userID uuid.UUID, avatarRef string) error
 }
 
@@ -36,6 +37,14 @@ func (s *User) GetUserPublicData(userID uuid.UUID) (model.User, error) {
 
 func (s *User) GetFullUserPublicData(userID uuid.UUID) (model.User, error) {
 	user, err := s.repo.GetFullUserPublicData(userID)
+	if err != nil {
+		return model.User{}, err
+	}
+	return user, nil
+}
+
+func (s *User) GetUserPrivateData(userID uuid.UUID) (model.User, error) {
+	user, err := s.repo.GetUserPrivateData(userID)
 	if err != nil {
 		return model.User{}, err
 	}
