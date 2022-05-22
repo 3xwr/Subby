@@ -110,6 +110,27 @@ func (db *Auth) SaveUser(username string, password string) error {
 	return nil
 }
 
+func (db *Auth) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error {
+	if oldPassword == newPassword {
+		return nil
+	}
+	hashedOldPassword := hash(oldPassword)
+	var userPasswordHashFromDB string
+	err := db.QueryRow("SELECT password FROM users WHERE id=$1", userID).Scan(&userPasswordHashFromDB)
+	if err != nil {
+		return err
+	}
+	if hashedOldPassword == userPasswordHashFromDB {
+		_, err := db.Exec("UPDATE users SET password=$1 WHERE id=$2", hash(newPassword), userID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("wrong old password")
+	}
+	return nil
+}
+
 func hash(data string) string {
 	hash := sha256.Sum256([]byte(data))
 	return hex.EncodeToString(hash[:])

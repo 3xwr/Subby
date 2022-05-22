@@ -7,6 +7,10 @@ type UserRequest struct {
 	FullInfo bool      `json:"full_info"`
 }
 
+type UserChangeAvatarRequest struct {
+	AvatarRef string `json:"avatar_ref"`
+}
+
 type UserIDRequest struct {
 	Username string `json:"username"`
 }

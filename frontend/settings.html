@@ -87,32 +87,60 @@
   </nav>
   <!-- Navbar -->
   <div class="form" name="login-form">
+    <h5 id="body-label">Настройки</h5>
   <form>
     <input type="text" style="display:none">
+
 <input type="password" style="display:none">
     <!-- Username input -->
+    <h5 id="body-label">Данные</h5>
     <div class="form-outline mb-4">
-      <input name="username" type="text"  id="form1Example1" class="form-control" />
-      <label class="form-label" for="form1Example1">Имя пользователя</label>
+      <input name="username" type="text" disabled id="form1Example1" class="form-control disabled-field" />
+      <label class="form-label" for="form1Example1" >Имя пользователя</label>
     </div>
 
      <!-- Password repeat input -->
      <div class="form-outline mb-4">
-      <input type="email" name="email" id="registerEmail" class="form-control"  />
+      <input type="email" name="email" id="registerEmail" disabled class="form-control disabled-field"  />
       <label class="form-label" for="registerEmail">Почта</label>
     </div>
   
+    <h5 id="body-label">Изменить пароль</h5>
     <!-- Password input -->
     <div class="form-outline mb-4">
-      <input name="password" type="password" id="registerPassword" class="form-control"  />
-      <label class="form-label" for="registerPassword">Пароль</label>
+      <input name="old_password" type="password" id="oldPassword" class="form-control"  />
+      <label class="form-label" for="oldPassword">Старый пароль</label>
     </div>
 
     <!-- Password repeat input -->
     <div class="form-outline mb-4">
-      <input type="password" name="repeat_password" id="registerRepeatPassword" class="form-control"  />
-      <label class="form-label" for="registerRepeatPassword">Повторите пароль</label>
+      <input type="password" name="new_password" id="newPassword" class="form-control"  />
+      <label class="form-label" for="newPassword">Новый пароль</label>
     </div>
+
+    <div class="form-outline mb-4">
+      <input type="password" name="repeat_password" id="repeatPassword" class="form-control"  />
+      <label class="form-label" for="repeatPassword">Повторите пароль</label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block" id="btn">Изменить пароль</button>
+
+    <h5 id="body-label">Изменить аватар</h5>
+
+    <div id="image-preview">
+      <label class="form-label" id="preview-label" hidden="hidden"
+        >Предварительный просмотр изображения</label
+      >
+      <img id="preview" />
+    </div>
+
+    <div id="img-submit">
+      <label class="form-label" for="customFile"
+        >Добавить изображение</label
+      >
+      <input type="file" class="form-control" name="img" />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" id="btn">Изменить аватар</button>
   
     <!-- 2 column grid layout for inline styling -->
     <div class="row mb-4">
@@ -126,10 +154,6 @@
       
   
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block" id="btn">Зарегистрироваться</button>
-    <div class="text-center" id="register-link">
-      <p>Уже зарегистрированы? <a href="http://localhost:9080/login.html"  id="link-reg">Войти</a></p>
-    </div>
   </form>
   
 </div>

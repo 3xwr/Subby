@@ -13,6 +13,11 @@ type Error struct {
 	Error string `json:"error"`
 }
 
+type UserChangePasswordRequest struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
 type AuthResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`

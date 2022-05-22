@@ -33,6 +33,19 @@ func (db *User) GetUserPublicData(userID uuid.UUID) (model.User, error) {
 	return u, nil
 }
 
+func (db *User) ChangeUserAvatar(userID uuid.UUID, avatarRef string) error {
+	var u model.User
+	err := db.QueryRow("SELECT id, username, avatar_ref FROM users WHERE id =$1", userID).Scan(&u.ID, &u.Name, &u.AvatarRef)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec("UPDATE users SET avatar_ref=$1 WHERE id=$2", avatarRef, userID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (db *User) GetFullUserPublicData(userID uuid.UUID) (model.User, error) {
 	var u model.User
 	sqlQuery := `SELECT u.id, u.username, u.avatar_ref, c.cnt

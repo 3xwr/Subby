@@ -100,6 +100,8 @@ func main() {
 		r.Method(http.MethodPost, handler.UserPostsPath, postsHandler)
 		r.Method(http.MethodPost, handler.MembershipIDByOwnerIDPath, membershipHandler)
 		r.Method(http.MethodPost, handler.SubscribeToMembershipTierPath, membershipHandler)
+		r.Method(http.MethodPost, handler.ChangeAvatarPath, userHandler)
+		r.Method(http.MethodPost, handler.ChangePasswordPath, authHandler)
 	})
 
 	srv := http.Server{

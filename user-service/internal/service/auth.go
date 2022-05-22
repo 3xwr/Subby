@@ -35,6 +35,7 @@ type AuthRepo interface {
 	GetUser(string, string) (*model.User, error)
 	SaveToken(uuid.UUID, string) error
 	SaveUser(string, string) error
+	ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error
 }
 
 func (s *Auth) Authenticate(username string, password string) (string, string, error) {
@@ -59,6 +60,14 @@ func (s *Auth) Authenticate(username string, password string) (string, string, e
 
 func (s *Auth) Register(username string, password string) error {
 	err := s.repo.SaveUser(username, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Auth) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error {
+	err := s.repo.ChangePassword(userID, oldPassword, newPassword)
 	if err != nil {
 		return err
 	}
