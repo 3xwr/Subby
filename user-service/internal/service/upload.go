@@ -27,7 +27,7 @@ func NewUpload(logger *zerolog.Logger, repo UploadRepo) *Upload {
 }
 
 const (
-	imgBasePath = "../../Subby-images/"
+	imgBasePath = "../frontend/img/"
 )
 
 var allowedExtensions = []string{".png", ".jpg", ".jpeg"}
@@ -86,6 +86,7 @@ func (s *Upload) UploadImage(file multipart.File, handler *multipart.FileHeader)
 		return "", fmt.Errorf("unsupported file format uploaded")
 	}
 
+	fileName = strings.TrimPrefix(fileName, imgBasePath)
 	return fileName, nil
 }
 

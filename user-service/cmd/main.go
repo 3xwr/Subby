@@ -46,11 +46,15 @@ func main() {
 	authRepo := repository.NewAuth(db)
 	contentRepo := repository.NewContent(db)
 	membershipRepo := repository.NewMembership(db)
+	shopRepo := repository.NewShop(db)
+	userRepo := repository.NewUser(db)
 
 	authService := service.NewAuth(&logger, authRepo, []byte(cfg.Secret))
 	contentService := service.NewContent(&logger, contentRepo, cfg.Secret)
 	uploadService := service.NewUpload(&logger, contentRepo)
 	membershipService := service.NewMembership(&logger, membershipRepo)
+	shopService := service.NewShop(&logger, shopRepo)
+	userService := service.NewUser(&logger, userRepo)
 
 	authHandler := handler.NewAuth(&logger, authService)
 	registerHandler := handler.NewRegister(&logger, authService)
@@ -58,6 +62,8 @@ func main() {
 	postsHandler := handler.NewPosts(&logger, contentService)
 	uploadHandler := handler.NewUpload(&logger, uploadService)
 	membershipHandler := handler.NewMembership(&logger, membershipService)
+	shopHandler := handler.NewShop(&logger, shopService)
+	userHandler := handler.NewUser(&logger, userService)
 
 	r.Route("/", func(r chi.Router) {
 		r.Use(cors.Handler(cors.Options{
@@ -71,6 +77,7 @@ func main() {
 
 		r.Method(http.MethodGet, handler.SubscriptionsPath, subscriptionsHandler)
 		r.Method(http.MethodGet, handler.PostsPath, postsHandler)
+		r.Method(http.MethodGet, handler.GetUserTiersPath, membershipHandler)
 
 		r.Method(http.MethodPost, handler.AuthPath, authHandler)
 		r.Method(http.MethodPost, handler.RegisterPath, registerHandler)
@@ -80,6 +87,22 @@ func main() {
 		r.Method(http.MethodPost, handler.PostPath, postsHandler)
 		r.Method(http.MethodPost, handler.DeletePostPath, postsHandler)
 		r.Method(http.MethodPost, handler.MembershipPath, membershipHandler)
+		r.Method(http.MethodPost, handler.CreateMembershipPath, membershipHandler)
+		r.Method(http.MethodPost, handler.DeleteMembershipPath, membershipHandler)
+		r.Method(http.MethodPost, handler.AddTierPath, membershipHandler)
+		r.Method(http.MethodPost, handler.DeleteTierPath, membershipHandler)
+		r.Method(http.MethodPost, handler.ShopPath, shopHandler)
+		r.Method(http.MethodPost, handler.AddItemPath, shopHandler)
+		r.Method(http.MethodPost, handler.DeleteItemPath, shopHandler)
+		r.Method(http.MethodPost, handler.UserDataPath, userHandler)
+		r.Method(http.MethodPost, handler.IDByNamePath, userHandler)
+		r.Method(http.MethodPost, handler.CheckSubPath, subscriptionsHandler)
+		r.Method(http.MethodPost, handler.UserPostsPath, postsHandler)
+		r.Method(http.MethodPost, handler.MembershipIDByOwnerIDPath, membershipHandler)
+		r.Method(http.MethodPost, handler.SubscribeToMembershipTierPath, membershipHandler)
+		r.Method(http.MethodPost, handler.ChangeAvatarPath, userHandler)
+		r.Method(http.MethodPost, handler.ChangePasswordPath, authHandler)
+		r.Method(http.MethodPost, handler.UserPrivateDataPath, userHandler)
 	})
 
 	srv := http.Server{

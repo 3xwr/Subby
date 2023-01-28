@@ -1,9 +1,5 @@
 package model
 
-import (
-	"github.com/google/uuid"
-)
-
 const (
 	UserExistsError = "user with this username already exists"
 )
@@ -13,13 +9,19 @@ type AuthRequest struct {
 	Password string `json:"password"`
 }
 
-type User struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type Error struct {
 	Error string `json:"error"`
+}
+
+type UserChangePasswordRequest struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }
 
 type AuthResponse struct {

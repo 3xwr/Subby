@@ -1,6 +1,7 @@
 package service
 
 import (
+	"sort"
 	"time"
 	"user-service/internal/model"
 
@@ -23,6 +24,8 @@ type ContentRepo interface {
 	SaveNewPost(model.Post) error
 	DeletePostFromDB(string, string) error
 	GetUserFeed(string, int) ([]model.Post, error)
+	CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error)
+	GetUserPosts(uuid.UUID, *uuid.UUID, int) ([]model.Post, error)
 }
 
 func NewContent(logger *zerolog.Logger, repo ContentRepo, secret string) *Content {
@@ -73,6 +76,14 @@ func (s *Content) UnsubscribeFromUser(unsubbingUserToken string, unsubscribeFrom
 	return nil
 }
 
+func (s *Content) CheckSubscribe(subbingUser uuid.UUID, checkUser uuid.UUID) (bool, error) {
+	subbed, err := s.repo.CheckSubscribe(subbingUser, checkUser)
+	if err != nil {
+		return false, err
+	}
+	return subbed, err
+}
+
 func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest) error {
 	userId, err := jwt.ParseString(userToken, jwt.WithVerify(jwa.HS256, []byte(s.secret)), jwt.WithValidate(true))
 	if err != nil {
@@ -92,7 +103,7 @@ func (s *Content) SubmitPost(userToken string, postData model.PostSubmitRequest)
 		PosterID:         posterID,
 		Body:             postData.Body,
 		MembershipLocked: postData.MembershipLocked,
-		MembershipTier:   postData.MembershipTier,
+		MembershipTiers:  postData.MembershipTiers,
 		ImageRef:         postData.ImageRef,
 	}
 	err = s.repo.SaveNewPost(post)
@@ -120,6 +131,17 @@ func (s *Content) GetPostsFeedByID(token string) ([]model.Post, error) {
 		return nil, err
 	}
 	posts, err := s.repo.GetUserFeed(userId.Subject(), defaultPostAmount)
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].PostedAt.After(posts[j].PostedAt)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+func (s *Content) GetUserPosts(posterID uuid.UUID, loggedInID *uuid.UUID) ([]model.Post, error) {
+	posts, err := s.repo.GetUserPosts(posterID, loggedInID, defaultPostAmount)
 	if err != nil {
 		return nil, err
 	}

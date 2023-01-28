@@ -1,0 +1,17 @@
+#preview-label{
+    display: hidden;
+}
+
+#preview{
+    width: 30%;
+    display: hidden;
+}
+
+#upload-form {
+    margin-top:0;
+}
+
+#body-label {
+    margin-bottom:1%;
+    margin-top:1%;
+}

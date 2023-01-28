@@ -45,16 +45,27 @@
     <!-- Navbar brand -->
       <a class="navbar-brand mt-2 mt-lg-0" href="#">
         <img
-          src="https://text2image.com/user_images/202205/text2image_B8635623_20220505_092745.png"
-          height="20"
-          alt="MDB Logo"
+          src="http://localhost:9080/img/bank-card-euro.png"
+          height = "40"
+          alt="Subby Logo"
           loading="lazy"
         />
       </a>
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="feed.html">Домой</a>
+          </li>
+          <li class="nav-item">
+            <div class="input-group">
+              <div class="form-outline">
+                <input id="search-input" type="search" id="form1" class="form-control" />
+                <label class="form-label" for="form1">Поиск</label>
+              </div>
+              <button id="search-button" type="button" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
           </li>
         </ul>
         <!-- Left links -->
@@ -65,7 +76,7 @@
       <div class="d-flex align-items-center">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="#">Login</a>
+              <a class="nav-link" href="#">Войти</a>
             </li>
           </ul>
         <!-- Avatar -->
@@ -77,16 +88,18 @@
   <!-- Navbar -->
   <div class="form" name="login-form">
   <form>
+    <input type="text" style="display:none">
+    <input type="password" style="display:none">
     <!-- Username input -->
     <div class="form-outline mb-4">
       <input name="username" type="text"  id="form1Example1" class="form-control" />
-      <label class="form-label" for="form1Example1">Username</label>
+      <label class="form-label" for="form1Example1">Имя пользователя</label>
     </div>
   
     <!-- Password input -->
     <div class="form-outline mb-4">
       <input name="password" type="password" id="form1Example2" class="form-control"  />
-      <label class="form-label" for="form1Example2">Password</label>
+      <label class="form-label" for="form1Example2">Пароль</label>
     </div>
   
     <!-- 2 column grid layout for inline styling -->
@@ -101,7 +114,11 @@
       
   
     <!-- Submit button -->
-    <button type="submit" class="btn btn-primary btn-block" id="btn">Sign in</button>
+    <button type="submit" class="btn btn-primary btn-block" id="btn">Войти</button>
+      <!-- Register buttons -->
+  <div class="text-center" id="register-link">
+    <p>Нет учетной записи? <a href="http://localhost:9080/register.html" id="link-reg">Зарегистрируйтесь</a></p>
+  </div>
   </form>
   
 </div>
@@ -111,6 +128,9 @@
     <script type="text/javascript" src="js/mdb.min.js"></script>
     <!-- login js -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="js/checklogin.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
+    <script type="text/javascript" src="js/search_bar.js"></script>
   </body>
 </html>

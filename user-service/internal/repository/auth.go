@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
@@ -48,8 +49,9 @@ func (db *Auth) SaveToken(userID uuid.UUID, token string) error {
 	return nil
 }
 
-func (db *Auth) SaveUser(username string, password string) error {
+func (db *Auth) SaveUser(username string, email string, password string) error {
 	var name string
+
 	err := db.QueryRow("SELECT username FROM users WHERE username = $1", username).Scan(&name)
 	if err != nil && err != sql.ErrNoRows {
 		return err
@@ -59,13 +61,72 @@ func (db *Auth) SaveUser(username string, password string) error {
 		return fmt.Errorf(model.UserExistsError)
 	}
 
+	ctx := context.Background()
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
 	userID, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("INSERT INTO users (id, username, password) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING", userID, username, hash(password))
+
+	defaultAvatarRef := "default_avatar.png"
+	_, err = tx.ExecContext(ctx, "INSERT INTO users (id, email, username, password, avatar_ref) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (username) DO NOTHING", userID, email, username, hash(password), defaultAvatarRef)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	subID, err := uuid.NewRandom()
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO user_subs (sub_id, user_id, subbed_to_user_id) VALUES ($1,$2,$3)", subID, userID, userID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	membershipID, err := uuid.NewRandom()
 	if err != nil {
 		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO memberships (id,owner_id) VALUES ($1,$2)", membershipID, userID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *Auth) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error {
+	if oldPassword == newPassword {
+		return nil
+	}
+	hashedOldPassword := hash(oldPassword)
+	var userPasswordHashFromDB string
+	err := db.QueryRow("SELECT password FROM users WHERE id=$1", userID).Scan(&userPasswordHashFromDB)
+	if err != nil {
+		return err
+	}
+	if hashedOldPassword == userPasswordHashFromDB {
+		_, err := db.Exec("UPDATE users SET password=$1 WHERE id=$2", hash(newPassword), userID)
+		if err != nil {
+			return err
+		}
+	} else {
+		return fmt.Errorf("wrong old password")
 	}
 	return nil
 }
